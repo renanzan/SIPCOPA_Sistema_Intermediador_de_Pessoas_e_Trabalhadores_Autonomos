@@ -1,0 +1,111 @@
+div.content {
+    flex: 1;
+    display: flex;
+    margin: 0 16%;
+    align-items: center;
+}
+
+div.ad {
+    width: 400px;
+}
+
+div.ad label {
+    color: #424361;
+    font-weight: 800;
+    font-size: 32px;
+}
+
+div.ad label.highlighted {
+    color: #2AABCC;
+}
+
+button {
+    border: none;
+    background: #2AABCC !important;
+    color: white;
+    padding: 10px 40px;
+    text-transform: uppercase;
+    border-radius: 4px;
+    margin-top: 20px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #2596B3 !important;
+}
+
+.decoration {
+    position: absolute;
+    z-index: -1;
+    bottom: 0;
+    right: 0;
+    width: auto;
+}
+
+.rocket {
+    position: absolute;
+    bottom: 15%;
+    right: 25%;
+}
+
+label.error {
+    color: red;
+    font-size: 14px;
+    font-weight: 400;
+    visibility: hidden;
+}
+
+.account-main-container {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10%;
+}
+
+.account-container-part-one {
+    display: flex;
+    flex-direction: column;
+    width: 250px;
+}
+
+.account-container-part-one label {
+    font-weight: 300;
+    margin: 20px 0;
+}
+
+.account-container-part-one label.title {
+    text-transform: uppercase;
+    font-weight: normal;
+    opacity: 1;
+    margin: 0;
+    font-size: 38px;
+}
+
+.account-container-part-two {
+    display: flex;
+    flex-direction: column;
+    width: 40%;
+    min-width: 350px;
+    background-color: white;
+    padding: 30px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.25);
+    border-radius: 4px;
+}
+
+.account-container-part-two label.caption {
+    text-transform: uppercase;
+    font-weight: 300;
+}
+
+.account-container-part-two label.title {
+    text-transform: uppercase;
+    font-size: 38px;
+}
+
+@media only screen and (max-width: 1200px) {
+    .rocket {
+        visibility: hidden;
+    }
+}

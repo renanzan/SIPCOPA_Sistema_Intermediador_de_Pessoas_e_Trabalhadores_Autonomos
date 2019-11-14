@@ -1,0 +1,131 @@
+div.header {
+    position: absolute;
+    width: 100%;
+    display: flex;
+    align-items: center;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+div.header div.left {
+    flex: 1;
+    display: flex;
+    padding: 3% 0 1% 3%;
+    flex-direction: column;
+}
+
+div.header div.right {
+    display: flex;
+    align-items: flex-end;
+    align-self: stretch;
+    flex-direction: column;
+    margin: 1% 3%;
+}
+
+label.logo {
+    align-self: flex-start;
+    color: #656570;
+    font-size: 32px;
+}
+
+div.top-navigation {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 40px;
+    height: 40px;
+    font-variant: small-caps;
+    color: #656570;
+    letter-spacing: 2px;
+}
+
+div.top-navigation label.selectable:hover {
+    font-weight: 600;
+    cursor: pointer;
+}
+
+div.top-navigation .current {
+    margin-top: 40px;
+    font-variant: small-caps;
+    color: #2AABCC;
+}
+
+div.user-info-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    color: #656570;
+    font-size: 14px;
+}
+
+div.user-info-container label.btn-desconectar:hover {
+    font-weight: 600;
+    cursor: pointer;
+}
+
+div.menu {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+div.menu ul {
+    display: flex;
+    list-style: none;
+    font-variant: small-caps;
+    font-size: 16px;
+}
+
+div.menu ul li {
+    color: #656570;
+    cursor: pointer;
+    margin: 0 0 0 20px;
+}
+
+div.menu ul li:first-child {
+    margin: 0px;
+}
+
+div.menu ul li:hover {
+    font-weight: 600;
+}
+
+div.menu ul li.selected {
+    color: #2AABCC;
+}
+
+div.user-points-container label {
+    font-size: 18px;
+}
+
+div.user-points-container {
+    display: flex;
+    align-items: center;
+    font-size: 18px;
+    transition: transform 100ms;
+    cursor: pointer;
+}
+
+div.user-points-container label {
+    cursor: pointer;
+    color: #656570;
+}
+
+div.user-points-container:hover {
+    font-weight: 600;
+    transform: scale(1.1);
+}
+
+div.user-points-container:active {
+    transform: scale(0.9);
+}
+
+div.user-points-container img {
+    width: 25px;
+    margin-left: 5px;
+    font-size: 18px;
+}
+

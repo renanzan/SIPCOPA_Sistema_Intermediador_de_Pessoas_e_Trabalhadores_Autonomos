@@ -1,0 +1,158 @@
+const Nominatim = require('../../services/Nominatim');
+const Authenticator = require('../util/Authenticator');
+
+const ProfissionalProfile = require('../database/models/ProfessionalProfile');
+const FreelanceWork = require('../database/models/FreelanceWork');
+
+const index = async (req, res) => {
+    const { authentication } = req.headers;
+    
+    try {
+        const professionalProfile = await checkIfHaveProfessionalProfile(authentication);
+        return res.json({ professionalProfile });
+    } catch(err) {
+        return res.json({ err });
+    }
+}
+
+const myProfessionalProfile = async (req, res) => {
+    const { authentication } = req.headers;
+
+    try {
+        const professionalProfile = await checkIfHaveProfessionalProfile(authentication);
+
+        const jobs = await FreelanceWork.find({ professionalProfileId: professionalProfile._id });
+
+        return res.json({ professionalProfile, jobs });
+    } catch(err) {
+        return res.json({ err });
+    }
+}
+
+const store = async (req, res) => {
+    const { authentication } = req.headers;
+    const { id:userId } = await Authenticator.decode(authentication);
+    const { url_photo, full_name, biography, date_of_birth, phone_number, email, state, city, district, street, number } = req.body;
+
+    await checkIfHaveProfessionalProfile(authentication).then((obj) => {
+        return res.json(obj);
+    }).catch(async (err) => {
+        try {
+            const { lat, lon } = await Nominatim.geosearch_structuredData({ state, city, district, street, number })
+                .then((result) => {
+                    return result.coordinates;
+                });
+
+            const profissionalProfile = await ProfissionalProfile.create({
+                userId,
+                urlPhoto: url_photo,
+                fullName: full_name,
+                biography,
+                dateOfBirth: date_of_birth,
+                phoneNumber: phone_number,
+                address: {
+                    state,
+                    city,
+                    district,
+                    street,
+                    number,
+                    coordinates: {
+                        lat,
+                        lon
+                    }
+                }
+            });
+
+            return res.json(profissionalProfile);
+        } catch(err) {
+            return res.json({ code: 404, error: err });
+        }
+    });
+}
+
+const update = async (req, res) => {
+    const { authentication } = req.headers;
+    const { id:userId } = await Authenticator.decode(authentication);
+    const { url_photo, full_name, biography, date_of_birth, phone_number, email, state, city, district, street, number } = req.body;
+    
+    await checkIfHaveProfessionalProfile(authentication).then(async (obj) => {
+        var objForUpdate = {};
+
+        objForUpdate.urlPhoto = url_photo;
+        if(full_name) objForUpdate.fullName = full_name;
+        if(biography) objForUpdate.biography = biography;
+        if(date_of_birth) objForUpdate.dateOfBirth = date_of_birth;
+        if(phone_number) objForUpdate.phoneNumber = phone_number;
+
+        if(state || city || district || street || number) {
+            objForUpdate.address = {};
+            objForUpdate.address.coordinates = {};
+
+            if(state) objForUpdate.address.state = state;
+            if(city) objForUpdate.address.city = city;
+            if(district) objForUpdate.address.district = district;
+            if(street) objForUpdate.address.street = street;
+            if(number) objForUpdate.address.number = number;
+
+            try {
+                const { lat, lon } = await Nominatim.geosearch_structuredData({ state, city, district, street, number })
+                .then((result) => {
+                    return result.coordinates;
+                });
+
+                objForUpdate.address.coordinates.lat = lat;
+                objForUpdate.address.coordinates.lon = lon;
+
+                const profissionalProfileUpdated = await ProfissionalProfile.findOneAndUpdate({ userId }, objForUpdate, { new: true });
+
+                return res.json(profissionalProfileUpdated);
+            } catch(err) {
+                return res.json({ code: 404, error: err });
+            }
+        }
+    }).catch((err) => {
+        return res.json({ code: 403, error: err });
+    });
+}
+
+const remove = async (req, res) => {
+    const { authentication } = req.headers;
+
+    const { id:userId } = await Authenticator.decode(authentication);
+    
+    await ProfissionalProfile.deleteOne({ userId });
+
+    // ProfissionalProfile.removeProfessionalProfile(userId);
+
+    return res.json();
+}
+
+const checkIfHaveProfessionalProfile = async (authentication) => {
+    const professionalProfile = await getProfessionalProfile(authentication);
+
+    if(!professionalProfile)
+        throw 'You do not have a professional profile yet.'
+    
+    return professionalProfile;
+}
+
+const getProfessionalProfile = async (authentication) => {
+    const { id:userId } = await Authenticator.decode(authentication);
+
+    const profissionalProfile = await ProfissionalProfile.findOne({
+        userId
+    });
+
+    return profissionalProfile;
+}
+
+module.exports = {
+    getProfessionalProfile,
+    checkIfHaveProfessionalProfile,
+
+    index,
+    myProfessionalProfile,
+    store,
+    update,
+    remove
+}
