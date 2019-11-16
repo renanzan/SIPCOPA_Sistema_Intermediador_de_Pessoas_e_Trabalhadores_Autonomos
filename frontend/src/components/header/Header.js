@@ -5,15 +5,25 @@ import { isAuthenticated, logout, getUser } from '../../services/auth'
 import './Header.css';
 import Coin from '../../assets/icons/coin.svg';
 
-const handleLogout = async (history) => {
+const handleLogout = (history) => {
     logout(history);
+}
+
+const handleRecharge = (history) => {
+    history.push('/recharge');
 }
 
 export default function Header(props) {
     const [authenticated, setAuthenticated] = useState(isAuthenticated());
+    const [currentUser, setCurrentUser] = useState({});
 
     useEffect(() => {
         setAuthenticated(isAuthenticated());
+
+        getUser().then((response) => {
+            if(response)
+                setCurrentUser(response.data);
+         });
 
     }, [isAuthenticated()]);
 
@@ -27,40 +37,72 @@ export default function Header(props) {
                 <TopNavigation pathname={pathname} history={history} />
             </div>
             <div className="right">
-                <UserInfo history={history} authenticated={authenticated} />
-                <Menu pathname={pathname} history={history} />
-                <UserPoints authenticated={authenticated} />
+                <UserInfo history={history} authenticated={authenticated} currentUser={currentUser}/>
+                <Menu authenticated={authenticated} pathname={pathname} history={history} />
+                <UserPoints authenticated={authenticated} currentUser={currentUser} history={history} />
             </div>
         </div>
     );
 }
 
-const Menu = ({ pathname, history }) => {
+const Menu = ({ authenticated, pathname, history }) => {
     return(
         <div className="menu">
-            <ul>
-                {
-                    pathname === '/' ?
-                        <li className="selected">Página inical</li> :
-                        <li onClick={ () => {history.push('/')} }>Página inical</li>
-                }
-                {
-                    pathname.toUpperCase().startsWith('/SERVICE') ?
-                        <li className="selected">Serviço</li> :
-                        <li onClick={ () => {history.push('/service/profissionais/Nome completo')} }>Serviço</li>
-                }
-                {
-                    pathname === '/about' ?
-                        <li className="selected">Sobre</li> :
-                        <li onClick={ () => {history.push('/about')} }>Sobre</li>
-                }
-                {
-                    pathname === '/connect' ?
-                        <li className="selected">Conectar</li> :
-                        <li onClick={ () => { history.push('/connect')} }>Conectar</li>
-                }
-            </ul>
+            {
+                authenticated ?
+                    <MenuConnected pathname={pathname} history={history} /> :
+                <MenuDisconnected pathname={pathname} history={history} />
+            }
         </div>
+    );
+}
+
+const MenuDisconnected = ({ pathname, history }) => {
+    return(
+        <ul>
+            {
+                pathname === '/' ?
+                    <li className="selected">Página inical</li> :
+                    <li onClick={ () => {history.push('/')} }>Página inical</li>
+            }
+            {
+                pathname.toUpperCase().startsWith('/SERVICE') ?
+                    <li className="selected">Serviço</li> :
+                    <li onClick={ () => {history.push('/service/profissionais/Nome completo')} }>Serviço</li>
+            }
+            {
+                pathname === '/about' ?
+                    <li className="selected">Sobre</li> :
+                    <li onClick={ () => {history.push('/about')} }>Sobre</li>
+            }
+            {
+                pathname === '/connect' ?
+                    <li className="selected">Conectar</li> :
+                    <li onClick={ () => { history.push('/connect')} }>Conectar</li>
+            }
+        </ul>
+    );
+}
+
+const MenuConnected = ({ pathname, history }) => {
+    return(
+        <ul>
+            {
+                pathname.toUpperCase().startsWith('/SERVICE') ?
+                    <li className="selected">Serviço</li> :
+                    <li onClick={ () => {history.push('/service/profissionais/Nome completo')} }>Serviço</li>
+            }
+            {
+                pathname === '/#' ?
+                    <li className="selected">Minha conta</li> :
+                    <li onClick={ () => { history.push('/#')} }>Minha conta</li>
+            }
+            {
+                pathname === '/#' ?
+                    <li className="selected">Anunciar</li> :
+                    <li onClick={ () => { history.push('/#')} }>Anunciar</li>
+            }
+        </ul>
     );
 }
 
@@ -106,28 +148,28 @@ const TopNavigation = ({ pathname, history }) => {
     );
 }
 
-const UserInfo = ({ history, authenticated }) => {
-
-    const [currentUser, setCurrentUser] = useState({});
-
-    getUser().then((response) => {
-        setCurrentUser(response);
-    });
-
-    console.log(currentUser);
-
+const UserInfo = ({ history, authenticated, currentUser }) => {
     return(
         <div className='user-info-container' style={styleHiddenIfDesconected({}, authenticated)}>
-            <label>conectado como {authenticated ? 'currentUser.username' : null }</label>
+            {
+                currentUser.user ? 
+                    <label>conectado como {authenticated ? currentUser.user.username : null }</label> :
+                <label>conectado como</label>
+            }
             <label className='btn-desconectar' onClick={(e) => {handleLogout(history)}}>desconectar</label>
         </div>
     );
 }
 
-const UserPoints = (authenticated) => {
+const UserPoints = ({ authenticated, currentUser, history }) => {
+    
     return(
-        <div className="user-points-container" style={styleHiddenIfDesconected({}, authenticated.authenticated)}>
-            <label>10.000</label>
+        <div className="user-points-container" style={styleHiddenIfDesconected({}, authenticated)} onClick={(e) => { handleRecharge(history); }} >
+            {
+                currentUser.user ? 
+                    <label>{currentUser.user.bitpoints}</label> :
+                <label>0</label>
+            }
             <img src={Coin} alt="Your coins" />
         </div>
     );

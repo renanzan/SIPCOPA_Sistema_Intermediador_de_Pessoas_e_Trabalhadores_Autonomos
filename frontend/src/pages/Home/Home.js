@@ -14,17 +14,15 @@ export default function Home({ history }) {
         history.push('/service');
 
     return (
-        <div className="main-container" >
-            <div className="content">
-                <div className="ad">
-                    <label>Alcance seus objetivos como um <label className="highlighted">profissional.</label></label>
-                    <button onClick={() => { history.push('/connect'); }}>Criar uma conta</button>
-                </div>
-                <div className="rocket">
-                    <LottieControl animationData={animationData} height="600" />
-                </div>
-                <img className="decoration" src={Decorartion} alt="decoration" />
+        <div className="main-container" style={{ justifyContent:'center' }}>
+            <div className="ad">
+                <label>Alcance seus objetivos como um <label className="highlighted">profissional.</label></label>
+                <button onClick={() => { history.push('/connect'); }}>Criar uma conta</button>
             </div>
+            <div className="rocket">
+                <LottieControl animationData={animationData} height="600" />
+            </div>
+            <img className="decoration" src={Decorartion} alt="decoration" />
         </div>
     );
 }

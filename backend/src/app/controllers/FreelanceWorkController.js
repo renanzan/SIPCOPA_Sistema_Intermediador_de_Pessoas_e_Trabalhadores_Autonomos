@@ -32,6 +32,8 @@ module.exports = {
         const page = (req.query.page >= 1) ? req.query.page : 1;
         const { filter, sort_by } = req.body;
 
+        console.log('body: ' + JSON.stringify(req.data));
+
         const jobs = await FreelanceWork.find(filter)
            .select('+professionalProfileId')
            .limit(parseInt(perPage))
@@ -81,7 +83,12 @@ module.exports = {
                 });
             });
         } else {
-            return res.json({ code: 404, error: 'Not found.' });
+            return res.json({
+                jobs,
+                page: parseInt(page),
+                perpage: parseInt(perPage),
+                results: count
+            });
         }
     },
 

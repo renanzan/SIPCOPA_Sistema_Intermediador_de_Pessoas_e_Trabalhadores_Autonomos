@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 
+import Arrow from '../../assets/icons/arrow.svg';
+
 export const InputText = (props) => {
     const [isEmpty, setIsEmpty] = useState(true);
     const [focus, setFocus] = useState(false);
@@ -25,9 +27,28 @@ export const InputText = (props) => {
                     value={props.useState}
                     onChange={handleTextChange}
                     onFocus={e => setFocus(true)}
-                    onBlur={e => setFocus(false)} />
+                    onBlur={e => setFocus(false)}
+                    onKeyDown={(e) => {
+                        if(e.key === 'Enter') {
+                            props.onPressEnter();
+                        }
+                    }}/>
             
                 {isEmpty ? <label style={styles.placeholder}>{props.placeholder}</label> : null}
+            </div>
+        </div>
+    );
+}
+
+export const OrderBy = (props) => {
+    const [desc, setDesc] = useState(true);
+
+    return(
+        <div style={Object.assign({}, styles.orderByContainer, props.style)} onClick={() => { props.setLowestPrice(!props.lowestPrice); setDesc(!desc); }}>
+            <label style={styles.orderByLabel}>Ordenar por</label>
+            <label style={styles.orderByValue}>Menor Preço</label>
+            <div style={styles.orderByButton}>
+                <img src={Arrow} alt='arrow' style={desc ? styles.orderByButtonIconDesc : styles.orderByButtonIconAsc} />
             </div>
         </div>
     );
@@ -82,5 +103,45 @@ const styles = {
         paddingRight: '10px',
         fontWeight: '300',
         fontSize: 14
+    },
+    orderByContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        border: 'solid',
+        borderWidth: '0 0 2px 0',
+        borderColor: '#656570',
+        height: '50px',
+        cursor: 'pointer'
+    },
+    orderByLabel: {
+        color: '#656570',
+        cursor: 'pointer'
+    },
+    orderByValue: {
+        color: '#2AABCC',
+        flex: 1,
+        textAlign: 'center',
+        cursor: 'pointer'
+    },
+    oderByArrow: {
+        display:'flex',
+        alignItems: 'çenter',
+        width: '50px'
+    },
+    orderByButton: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '50px',
+        height: '50px'
+    },
+    orderByButtonIconDesc: {
+        width: '10px',
+        transform: 'rotate(90deg)'
+    },
+    orderByButtonIconAsc: {
+        width: '10px',
+        transform: 'rotate(270deg)'
     }
 }

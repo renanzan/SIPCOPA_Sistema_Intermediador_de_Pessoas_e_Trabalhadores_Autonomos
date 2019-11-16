@@ -20,7 +20,7 @@ routes.post('/professional_profile/new', ProfessionalProfileController.store);
 routes.post('/professional_profile/update', ProfessionalProfileController.update);
 routes.post('/professional_profile/remove', ProfessionalProfileController.remove);
 
-routes.get('/service', FreelanceWorkController.index);
+routes.post('/service', FreelanceWorkController.index);
 routes.post('/job/new', FreelanceWorkController.store);
 routes.post('/job/suggest_price', FreelanceWorkController.getMarketStatistics);
 

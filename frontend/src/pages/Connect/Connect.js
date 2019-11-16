@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import api from '../../services/api';
 import { login, logout, isAuthenticated } from '../../services/auth'
 
-import { InputText } from '../../components/custom/InputText';
+import { InputText } from '../../components/custom/Input';
 import Decorartion from '../../assets/decorations.svg';
 
 const handleLogin = async (history, username, password) => {
@@ -22,14 +22,14 @@ export default function Connect({ history }) {
 
     return (
         <div className="main-container" >
-            <div className="content" style={{ marginTop:'200px' }}>
+            {/* <div className="content"> */}
                 {
                     state === 0 ?
                         <Login history={history} setState={setState} /> :
                     <Register setState={setState} />
                 }
                 <img className="decoration" src={Decorartion} alt="decoration" />
-            </div>
+            {/* </div> */}
         </div>
     );
 }
