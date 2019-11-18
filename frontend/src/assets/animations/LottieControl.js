@@ -30,15 +30,12 @@ export default class LottieControl extends React.Component {
         }
     };
 
-    return <div>
+    return <div style={this.props.style}>
       <Lottie options={defaultOptions}
               height={parseInt(height) || 400}
               width={parseInt(width) || 400}
               isStopped={this.state.isStopped}
               isPaused={this.state.isPaused}/>
-      {/* <button style={buttonStyle} onClick={() => this.setState({isStopped: true})}>stop</button>
-      <button style={buttonStyle} onClick={() => this.setState({isStopped: false})}>play</button>
-      <button style={buttonStyle} onClick={() => this.setState({isPaused: !this.state.isPaused})}>pause</button> */}
     </div>
   }
 }

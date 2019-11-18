@@ -20,14 +20,29 @@ body, input, button {
 }
 
 div.main-container {
-    flex: 10;
     display: flex;
     flex-direction: column;
-    width: 100%;
+    position: relative;
     min-height: calc(100% - 150px);
 }
 
 button {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+div.card {
+    display: flex;
+    flex-direction: column;
+    background: white;
+    padding: 15px;
+    border-radius: 4px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.25);
+}
+
+.unselectable {
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;

@@ -93,9 +93,9 @@ const MenuConnected = ({ pathname, history }) => {
                     <li onClick={ () => {history.push('/service/profissionais/Nome completo')} }>Serviço</li>
             }
             {
-                pathname === '/#' ?
+                pathname.toUpperCase() === '/MY_ACCOUNT' ?
                     <li className="selected">Minha conta</li> :
-                    <li onClick={ () => { history.push('/#')} }>Minha conta</li>
+                    <li onClick={ () => { history.push('/my_account')} }>Minha conta</li>
             }
             {
                 pathname === '/#' ?

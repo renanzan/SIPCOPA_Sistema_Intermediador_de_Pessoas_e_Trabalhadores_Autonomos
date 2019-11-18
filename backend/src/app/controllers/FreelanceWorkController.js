@@ -32,8 +32,6 @@ module.exports = {
         const page = (req.query.page >= 1) ? req.query.page : 1;
         const { filter, sort_by } = req.body;
 
-        console.log('body: ' + JSON.stringify(req.data));
-
         const jobs = await FreelanceWork.find(filter)
            .select('+professionalProfileId')
            .limit(parseInt(perPage))
@@ -63,8 +61,8 @@ module.exports = {
             ]);
 
             for(var count = 0; count < jobs.length; count++) {
-                const { urlPhoto, likes, fullName } = await ProfessionalProfile.findOne({ _id: jobs[count].professionalProfileId });
-                jobs[count] = { user_info: { urlPhoto, likes, fullName }, ...jobs[count]._doc };
+                const { userId, urlPhoto, likes, fullName } = await ProfessionalProfile.findOne({ _id: jobs[count].professionalProfileId }).select('+userId');
+                jobs[count] = { user_info: { userId, urlPhoto, likes, fullName }, ...jobs[count]._doc };
                 delete jobs[count].__v;
                 delete jobs[count].professionalProfileId;
             }

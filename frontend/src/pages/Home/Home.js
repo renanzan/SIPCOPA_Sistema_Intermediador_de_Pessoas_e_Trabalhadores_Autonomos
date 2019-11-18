@@ -4,7 +4,7 @@ import './home.css';
 import animationData from '../../assets/animations/lottie.json/rocket.json';
 import LottieControl from '../../assets/animations/LottieControl';
 
-import Header from '../../components/header/Header';
+import Header from '../../components/Header/Header';
 import { isAuthenticated } from '../../services/auth'
 
 import Decorartion from '../../assets/decorations.svg';

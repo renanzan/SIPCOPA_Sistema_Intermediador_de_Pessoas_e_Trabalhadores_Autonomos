@@ -6,16 +6,26 @@ import './service.css';
 import { InputText, OrderBy } from '../../components/custom/Input';
 import JobCard from '../../components/custom/JobCard';
 
+import AnimationData1 from '../../assets/animations/lottie.json/jobs/fresh-new-job.json';
+import AnimationData2 from '../../assets/animations/lottie.json/jobs/looking-for-jobs.json';
+import AnimationData3 from '../../assets/animations/lottie.json/jobs/looking-for-jobs-2.json';
+import LottieControl from '../../assets/animations/LottieControl';
+
+import Footer from '../../components/Footer/Footer';
+
 export default function Service (props) {
     const [search, setSearch] = useState('');
     const [lowestPrice, setLowestPrice] = useState(true);
 
     const [jobs, setJobs] = useState({});
     const [page, setPage] = useState(1);
+    const [loading, setLoading] = useState(true);
 
     const [reload, setReload] = useState(false);
 
     useEffect(() => {
+        setLoading(true);
+
         api.post(`/service?page=${page}`, {
             filter: {
                 $or: [{
@@ -43,8 +53,11 @@ export default function Service (props) {
         }).then((response) => {
             console.log(response.data);
             setJobs(response.data);
+            setLoading(false);
         });
     }, [page, reload, lowestPrice]);
+
+    // const number = 
 
     return(
         <div className='main-container'>
@@ -54,7 +67,17 @@ export default function Service (props) {
             <SearchContainer search={search} setSearch={setSearch} jobs={jobs} reload={reload} setReload={setReload} />
             <div className="list-container">
                 <Filter lowestPrice={lowestPrice} setLowestPrice={setLowestPrice} />
-                <List jobs={jobs} />
+                {
+                    loading ? (() => {
+                        if((Math.floor(Math.random()*3) + 1) === 1)
+                            return(<LottieControl animationData={AnimationData1} height="400" style={styles.loadingContainer} />);
+                        if((Math.floor(Math.random()*3) + 1) === 2)
+                            return(<LottieControl animationData={AnimationData2} height="400" style={styles.loadingContainer} />);
+                        else
+                            return(<LottieControl animationData={AnimationData3} height="400" style={styles.loadingContainer} />);
+                        })() :
+                    <List jobs={jobs} />
+                }
             </div>
             <Footer />
         </div>
@@ -87,21 +110,17 @@ const List = ({ jobs }) => {
     return(
         <div style={styles.list}>
             {
-                jobs.jobs ? 
-                    jobs.jobs.map((element, index) => {
-                        return(
-                            <JobCard job={element}/>
-                        );
-                    })
-                : null
+                (jobs.jobs.length > 0) ?
+                    jobs.jobs ? 
+                        jobs.jobs.map((element, index) => {
+                            return(
+                                <JobCard job={element}/>
+                            );
+                        })
+                    : null
+                : <div>Nenhum resultado encontrado..</div>
             }
         </div>
-    );
-}
-
-const Footer = () => {
-    return(
-        <div className="footer">FOOTER</div>
     );
 }
 
@@ -110,7 +129,10 @@ const styles = {
         flex: 1,
         alignSelf: 'flex-start',
         display: 'flex',
-        margin: '50px 3% 0 0',
         flexWrap: 'wrap'
+    },
+    loadingContainer: {
+        width: '100%',
+        marginTop: '100px'
     }
 }

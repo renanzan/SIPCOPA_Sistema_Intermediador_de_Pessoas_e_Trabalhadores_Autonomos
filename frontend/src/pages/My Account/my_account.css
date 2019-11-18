@@ -1,0 +1,81 @@
+div.accountInfoContainer {
+    display: flex;
+    position: absolute;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+div.tagJob {
+    background-color: #E3E3E3;
+    font-variant: small-caps;
+    font-size: 12px;
+    border-radius: 20px;
+    padding: 1px 10px;
+    margin: 5px 5px;
+    cursor: pointer;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+div.tagJob:hover {
+    background: rgb(202, 201, 201);
+}
+
+div.tagJobSelected {
+    background: #2AABCC;
+    color: white;
+    font-variant: small-caps;
+    font-size: 12px;
+    border-radius: 20px;
+    padding: 1px 10px;
+    margin: 5px 5px;
+    cursor: pointer;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+div.tagJobSelected:hover {
+    background: rgb(38, 142, 168);
+}
+
+div.cardAccountInfo {
+    background-color: white;
+    padding: 20px;
+    border-radius: 4px;
+    min-width: 600px;
+    max-width: 900px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.25);
+}
+
+div.jobCard {
+    background-color: white;
+    min-width: 450px;
+    padding: 10px;
+    margin: 0 50px;
+    border-radius: 4px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.25);
+}
+
+@media only screen and (max-width: 1000px) {
+    div.accountInfoContainer {
+        flex-direction: column;
+        height: auto;
+    }
+
+    div.cardAccountInfo {
+        margin-top: 40px;
+    }
+
+    div.jobCard {
+        margin-top: 40px;
+        margin-bottom: 40px;
+    }
+}
