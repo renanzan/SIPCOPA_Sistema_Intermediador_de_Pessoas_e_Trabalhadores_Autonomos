@@ -1,10 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import Arrow from '../../assets/icons/arrow.svg';
 
 export const InputText = (props) => {
     const [isEmpty, setIsEmpty] = useState(true);
     const [focus, setFocus] = useState(false);
+
+    useEffect(() => {
+        if(props.useState.length > 0)
+            setIsEmpty(false);
+    }, []);
     
     const handleTextChange = (event) => {
         props.setState(event.target.value);

@@ -8,6 +8,7 @@ import Presentation from './pages/Home/Home';
 import Connect from './pages/Connect/Connect';
 import Service from './pages/Service/Service';
 import MyAccount from './pages/My Account/MyAccount';
+import NewJob from './pages/New Job/NewJob';
 
 export default function Routes() {
     return (
@@ -18,6 +19,7 @@ export default function Routes() {
                 <Route exact path='/connect' component={Connect} />
                 <Route path='/service' component={Service} />
                 <Route path='/my_account' component={MyAccount} />
+                <Route path='/new_job' component={NewJob} />
             {/* </Switch> */}
         </BrowserRouter>
     );

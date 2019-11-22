@@ -8,6 +8,12 @@ const HireController = require('./app/controllers/HireController');
 
 const routes = express.Router();
 
+routes.get('/get_job_option', (req, res) => {
+    const { service_possibilities } = require('./config/app.json');
+
+    return res.json(service_possibilities);
+});
+
 routes.post('/auth', AuthController.authenticate);
 routes.post('/auth/register', AuthController.register);
 routes.post('/auth/profile', AuthController.index);

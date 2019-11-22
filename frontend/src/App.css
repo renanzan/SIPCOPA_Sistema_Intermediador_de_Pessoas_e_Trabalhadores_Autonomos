@@ -42,6 +42,18 @@ div.card {
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.25);
 }
 
+label.card-title {
+    font-variant: small-caps;
+    letter-spacing: 2px;
+    align-self: center;
+    color: #656570;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
 .unselectable {
     -webkit-user-select: none;
     -moz-user-select: none;

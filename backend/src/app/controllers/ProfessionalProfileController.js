@@ -73,7 +73,7 @@ const store = async (req, res) => {
 const update = async (req, res) => {
     const { authentication } = req.headers;
     const { id:userId } = await Authenticator.decode(authentication);
-    const { url_photo, full_name, biography, date_of_birth, phone_number, email, state, city, district, street, number } = req.body;
+    const { url_photo, full_name, biography, date_of_birth, phone_number, state, city, district, street, number } = req.body;
     
     await checkIfHaveProfessionalProfile(authentication).then(async (obj) => {
         var objForUpdate = {};

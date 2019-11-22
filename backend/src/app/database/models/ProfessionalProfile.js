@@ -67,6 +67,7 @@ const ProfissionalProfileSchema = new Schema({
 });
 
 ProfissionalProfileSchema.pre('deleteOne', { document: true }, async function (next) {
+    console.log('deleting...');
     const { userId } = this._conditions;
 
     const ProfissionalProfile = model('ProfissionalProfile', ProfissionalProfileSchema);

@@ -100,7 +100,7 @@ module.exports = {
             return res.json({ code: 403, error: 'O parâmetro job não é uma opção válida.' });
 
         const rate_range = ['0:1', '1:2', '2:3', '3:4', '4:5'];
-        const smaller_price = [], biggest_price = [], average = [];
+        const smaller_price = [], biggest_price = [], average = [], occurrences = [];
         
         Promise.all([
             await FreelanceWork.findOne({ job, rate: { '$gte': 0, '$lt': 1 } }, {}, { sort: { 'price' : 1 } }, function(err, job) {
@@ -141,6 +141,26 @@ module.exports = {
 
             await FreelanceWork.findOne({ job, rate: { '$gte': 4, '$lte': 5 } }, {}, { sort: { 'price' : -1 } }, function(err, job) {
                 (job) ? biggest_price.push(job.price) : biggest_price.push(-1);
+            }),
+
+            await FreelanceWork.find({ job, rate: { '$gte': 0, '$lt': 1 } }).count(function(err, count) {
+                occurrences.push(count);
+            }),
+
+            await FreelanceWork.find({ job, rate: { '$gte': 1, '$lt': 2 } }).count(function(err, count) {
+                occurrences.push(count);
+            }),
+
+            await FreelanceWork.find({ job, rate: { '$gte': 2, '$lt': 3 } }).count(function(err, count) {
+                occurrences.push(count);
+            }),
+
+            await FreelanceWork.find({ job, rate: { '$gte': 3, '$lt': 4 } }).count(function(err, count) {
+                occurrences.push(count);
+            }),
+
+            await FreelanceWork.find({ job, rate: { '$gte': 4, '$lt': 5 } }).count(function(err, count) {
+                occurrences.push(count);
             })
         ]);
 
@@ -156,7 +176,8 @@ module.exports = {
                 rate_range,
                 smaller_price,
                 biggest_price,
-                average
+                average,
+                occurrences
             }
         });
     }
