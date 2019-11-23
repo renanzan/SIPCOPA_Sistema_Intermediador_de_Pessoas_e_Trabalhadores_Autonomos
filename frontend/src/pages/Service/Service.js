@@ -11,6 +11,8 @@ import AnimationData2 from '../../assets/animations/lottie.json/jobs/looking-for
 import AnimationData3 from '../../assets/animations/lottie.json/jobs/looking-for-jobs-2.json';
 import LottieControl from '../../assets/animations/LottieControl';
 
+import Slider from '@material-ui/core/Slider';
+
 import Footer from '../../components/Footer/Footer';
 
 export default function Service (props) {
@@ -94,12 +96,50 @@ const SearchContainer = ({ search, setSearch, jobs, reload, setReload }) => {
 }
 
 const Filter = ({ lowestPrice, setLowestPrice }) => {
+    const [value, setValue] = React.useState([0, 37]);
+
+    const handleChange = (event, newValue) => {
+        setValue(newValue);
+    };
+
+    function valuetext(value) {
+        return `${value} points`;
+    }
+
+    const marks = [
+        {
+          value: 0,
+          label: '0 Ɏ',
+        },
+        {
+          value: 25,
+          label: '25 Ɏ',
+        },
+        {
+          value: 50,
+          label: '50 Ɏ',
+        }
+      ];
+
     return(
         <div className="left-container">
             <OrderBy style={{ marginBottom: '25px' }} lowestPrice={lowestPrice} setLowestPrice={setLowestPrice} />
             <div className="filter-container">
                 <div className="filter-content">
                     <label className="title">Filtros</label>
+
+                    <label>Intervalo de preço</label>
+                    <Slider
+                        orientation="vertical"
+                        value={value}
+                        onChange={handleChange}
+                        valueLabelDisplay="auto"
+                        aria-labelledby="range-slider"
+                        aria-labelledby="vertical-slider"
+                        getAriaValueText={valuetext}
+                        max="50"
+                        marks={marks}
+                    />
                 </div>
             </div>
         </div>

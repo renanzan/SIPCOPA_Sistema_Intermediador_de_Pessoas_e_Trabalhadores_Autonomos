@@ -171,7 +171,7 @@ module.exports = {
                 } }
             ]).then(response => {
                 if(response.length > 0)
-                    average.push(Math.ceil(response[0].sum / occurrences[2]));
+                    average.push(Math.ceil(response[0].sum / occurrences[0]));
                 else
                     average.push(-1);
             }),
@@ -184,7 +184,7 @@ module.exports = {
                 } }
             ]).then(response => {
                 if(response.length > 0)
-                    average.push(Math.ceil(response[0].sum / occurrences[2]));
+                    average.push(Math.ceil(response[0].sum / occurrences[1]));
                 else
                     average.push(-1);
             }),
@@ -210,7 +210,7 @@ module.exports = {
                 } }
             ]).then(response => {
                 if(response.length > 0)
-                    average.push(Math.ceil(response[0].sum / occurrences[2]));
+                    average.push(Math.ceil(response[0].sum / occurrences[3]));
                 else
                     average.push(-1);
             }),
@@ -223,7 +223,7 @@ module.exports = {
                 } }
             ]).then(response => {
                 if(response.length > 0)
-                    average.push(Math.ceil(response[0].sum / occurrences[2]));
+                    average.push(Math.ceil(response[0].sum / occurrences[4]));
                 else
                     average.push(-1);
             })
@@ -232,7 +232,7 @@ module.exports = {
 
         for(var count=0; count<rate_range.length; count++)
             if(smaller_price[count] != -1 && biggest_price[count] != -1)
-                partial_average.push(Math.ceil(smaller_price[count] + biggest_price[count]) / 2);
+                partial_average.push(Math.ceil((smaller_price[count] + biggest_price[count]) / 2));
             else
                 partial_average.push(-1);
 
