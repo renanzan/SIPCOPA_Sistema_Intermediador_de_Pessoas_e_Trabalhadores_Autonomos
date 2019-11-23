@@ -15,6 +15,12 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import Paper from '@material-ui/core/Paper';
 
 export default function NewJob({ history }) {
     const [job, setJob] = React.useState();
@@ -325,17 +331,8 @@ const CancelButton = ({ handleAddWork }) => {
 
 const DialogCalculator = ({ job }) => {
     const [open, setOpen] = React.useState(false);
-
-    React.useEffect(() => {
-        (async () => {
-            const teste = await api.post('/job/suggest_price', {
-                job
-            });
-    
-            if(teste)
-                console.log(teste.data);
-        })();
-    }, [job]);
+    const [custos, setCustos] = React.useState(0);
+    const [receber, setReceber] = React.useState(0);
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -349,32 +346,156 @@ const DialogCalculator = ({ job }) => {
         <div>
           <CalculatorButton onClick={handleClickOpen} />
           <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
-            <DialogTitle id="form-dialog-title">Calculadora</DialogTitle>
+            <DialogTitle id="form-dialog-title">Calculadora de Valor</DialogTitle>
             <DialogContent>
               <DialogContentText>
-                Não sabe quanto cobrar pelo seu serviço?<br />Podemos te ajudar nisso!
+                Não sabe quanto cobrar pelo seu serviço?<br />Podemos te ajudar com isso!
               </DialogContentText>
               <div>
-                  { job ? <div>Serviço selecionado: {job}</div> : 'Nenhum serviço selecionado.' }
+                  { job ? <PricesTable job={job} /> : 'Nenhum serviço selecionado.' }
               </div>
+
               <TextField
-                autoFocus
                 margin="dense"
-                id="name"
-                label="Email Address"
-                type="email"
+                id="custos"
+                label="Soma dos custos com o trabalho em reais"
+                type="number"
+                helperText="Funcionário, impostos, etc."
+                inputProps={{ min: "0", max: "10", step: "1" }}
+                style={{ marginTop:'20px' }}
                 fullWidth
+                onChange={e => {
+                  setCustos(e.target.value)
+                }}
               />
+              <TextField
+                margin="dense"
+                id="receber"
+                label="Quanto você pretende receber por trabalho em reais"
+                type="number"
+                inputProps={{ min: "0", max: "10", step: "1" }}
+                style={{ marginTop:'20px' }}
+                fullWidth
+                onChange={e => {
+                  setReceber(e.target.value)
+                }}
+              />
+              <div>
+                Sugestão de preço R$ 
+                { Number.parseFloat(custos) + Number.parseFloat(receber) } (
+                { Math.ceil((Number.parseFloat(custos) + Number.parseFloat(receber)) / 2) } bitpoints)
+              </div>
+              
+              <div>
+                O valor resultante está abaixo do menor valor cobrado nas mesmas situações, este valor provavelmente é atrativo para o mercado.
+              </div>
             </DialogContent>
             <DialogActions>
               <Button onClick={handleClose} color="primary">
                 Cancel
-              </Button>
-              <Button onClick={handleClose} color="primary">
+              </Button><Button onClick={handleClose} color="primary">
                 Subscribe
               </Button>
             </DialogActions>
           </Dialog>
         </div>
       );
+}
+
+const PricesTable = ({ job }) => {
+  const [rows, setRows] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+
+  const useStyles = makeStyles({
+    root: {
+      width: '100%',
+      overflowX: 'auto',
+    },
+    table: {
+      minWidth: 650,
+    },
+  });
+  
+  function createData(avaliacao, ocorrencia, _min, _max, _medParcial, _med) {
+    const min = (_min !== -1) ? _min : 'NaN';
+    const max = (_max !== -1) ? _max : 'NaN';
+    const medParcial = (_medParcial !== -1) ? _medParcial : 'NaN';
+    const med = (_med !== -1) ? _med : 'NaN';
+
+    return { avaliacao, ocorrencia, min, max, medParcial, med };
+  }
+
+  const classes = useStyles();
+
+    React.useEffect(() => {
+        (async () => {
+            setLoading(true);
+
+            await api.post('/job/suggest_price', {
+                job
+            }).then(response => {
+              if(response.data) {
+                const { data } = response;
+
+                const tempRows = [];
+
+                for(var index = 0; index < 5; index++) {
+                  tempRows.push(
+                    createData(
+                      data.price_by_rate.rate_range[index],
+                      data.price_by_rate.occurrences[index],
+                      data.price_by_rate.smaller_price[index],
+                      data.price_by_rate.biggest_price[index],
+                      data.price_by_rate.partial_average[index],
+                      data.price_by_rate.average[index]
+                    )
+                  );
+                }
+
+                setRows(tempRows);
+              }
+            });
+            
+            setLoading(false);
+        })();
+    }, [job]);
+  
+  return(
+    <div>
+       {
+         loading ?
+          'Loading...' :
+        <div>
+          <div style={{ marginBottom:'20px'}}>Serviço selecionado: <b>{job}</b></div>
+
+          <Paper className={classes.root}>
+          <Table className={classes.table} aria-label="simple table">
+            <TableHead>
+              <TableRow>
+                <TableCell>Avaliação</TableCell>
+                <TableCell align="right">Ocorrencia</TableCell>
+                <TableCell align="right">Mínimo&nbsp;(bp)</TableCell>
+                <TableCell align="right">Máximo&nbsp;(bp)</TableCell>
+                <TableCell align="right">Média P.&nbsp;(bp)</TableCell>
+                <TableCell align="right">Média&nbsp;(bp)</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {rows.map(row => (
+                <TableRow key={row.name}>
+                  <TableCell component="th" scope="row" align="center">{row.avaliacao}</TableCell>
+                  <TableCell align="center">{row.ocorrencia}</TableCell>
+                  <TableCell align="center">{row.min}</TableCell>
+                  <TableCell align="center">{row.max}</TableCell>
+                  <TableCell align="center">{row.medParcial}</TableCell>
+                  <TableCell align="center">{row.med}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          </Paper>
+        </div>
+       }
+    </div>
+  );
 }

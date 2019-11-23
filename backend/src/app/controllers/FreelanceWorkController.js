@@ -100,7 +100,7 @@ module.exports = {
             return res.json({ code: 403, error: 'O parâmetro job não é uma opção válida.' });
 
         const rate_range = ['0:1', '1:2', '2:3', '3:4', '4:5'];
-        const smaller_price = [], biggest_price = [], average = [], occurrences = [];
+        const smaller_price = [], biggest_price = [], partial_average = [], occurrences = [], average = [];
         
         Promise.all([
             await FreelanceWork.findOne({ job, rate: { '$gte': 0, '$lt': 1 } }, {}, { sort: { 'price' : 1 } }, function(err, job) {
@@ -143,32 +143,98 @@ module.exports = {
                 (job) ? biggest_price.push(job.price) : biggest_price.push(-1);
             }),
 
-            await FreelanceWork.find({ job, rate: { '$gte': 0, '$lt': 1 } }).count(function(err, count) {
+            await FreelanceWork.find({ job, rate: { '$gte': 0, '$lt': 1 } }).countDocuments(function(err, count) {
                 occurrences.push(count);
             }),
 
-            await FreelanceWork.find({ job, rate: { '$gte': 1, '$lt': 2 } }).count(function(err, count) {
+            await FreelanceWork.find({ job, rate: { '$gte': 1, '$lt': 2 } }).countDocuments(function(err, count) {
                 occurrences.push(count);
             }),
 
-            await FreelanceWork.find({ job, rate: { '$gte': 2, '$lt': 3 } }).count(function(err, count) {
+            await FreelanceWork.find({ job, rate: { '$gte': 2, '$lt': 3 } }).countDocuments(function(err, count) {
                 occurrences.push(count);
             }),
 
-            await FreelanceWork.find({ job, rate: { '$gte': 3, '$lt': 4 } }).count(function(err, count) {
+            await FreelanceWork.find({ job, rate: { '$gte': 3, '$lt': 4 } }).countDocuments(function(err, count) {
                 occurrences.push(count);
             }),
 
-            await FreelanceWork.find({ job, rate: { '$gte': 4, '$lt': 5 } }).count(function(err, count) {
+            await FreelanceWork.find({ job, rate: { '$gte': 4, '$lt': 5 } }).countDocuments(function(err, count) {
                 occurrences.push(count);
+            }),
+
+            await FreelanceWork.aggregate([
+                { $match: {  job, rate: { '$gte': 0, '$lte': 1 } } },
+                { $group: {
+                    _id: '0-1',
+                    sum: { $sum: '$price'}
+                } }
+            ]).then(response => {
+                if(response.length > 0)
+                    average.push(Math.ceil(response[0].sum / occurrences[2]));
+                else
+                    average.push(-1);
+            }),
+
+            await FreelanceWork.aggregate([
+                { $match: {  job, rate: { '$gte': 1, '$lte': 2 } } },
+                { $group: {
+                    _id: '1-2',
+                    sum: { $sum: '$price'}
+                } }
+            ]).then(response => {
+                if(response.length > 0)
+                    average.push(Math.ceil(response[0].sum / occurrences[2]));
+                else
+                    average.push(-1);
+            }),
+
+            await FreelanceWork.aggregate([
+                { $match: {  job, rate: { '$gte': 2, '$lte': 3 } } },
+                { $group: {
+                    _id: '2-3',
+                    sum: { $sum: '$price'}
+                } }
+            ]).then(response => {
+                if(response.length > 0)
+                    average.push(Math.ceil(response[0].sum / occurrences[2]));
+                else
+                    average.push(-1);
+            }),
+
+            await FreelanceWork.aggregate([
+                { $match: {  job, rate: { '$gte': 3, '$lte': 4 } } },
+                { $group: {
+                    _id: '3-4',
+                    sum: { $sum: '$price'}
+                } }
+            ]).then(response => {
+                if(response.length > 0)
+                    average.push(Math.ceil(response[0].sum / occurrences[2]));
+                else
+                    average.push(-1);
+            }),
+
+            await FreelanceWork.aggregate([
+                { $match: {  job, rate: { '$gte': 4, '$lte': 5 } } },
+                { $group: {
+                    _id: '4-5',
+                    sum: { $sum: '$price'}
+                } }
+            ]).then(response => {
+                if(response.length > 0)
+                    average.push(Math.ceil(response[0].sum / occurrences[2]));
+                else
+                    average.push(-1);
             })
+
         ]);
 
         for(var count=0; count<rate_range.length; count++)
             if(smaller_price[count] != -1 && biggest_price[count] != -1)
-                average.push(Math.ceil((smaller_price[count] + biggest_price[count]) / 2));
+                partial_average.push(Math.ceil(smaller_price[count] + biggest_price[count]) / 2);
             else
-                average.push(-1);
+                partial_average.push(-1);
 
         return res.json({
             job,
@@ -176,8 +242,9 @@ module.exports = {
                 rate_range,
                 smaller_price,
                 biggest_price,
-                average,
-                occurrences
+                partial_average,
+                occurrences,
+                average
             }
         });
     }
