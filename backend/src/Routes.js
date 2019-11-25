@@ -5,6 +5,7 @@ const UserController = require('./app/controllers/UserController');
 const ProfessionalProfileController = require('./app/controllers/ProfessionalProfileController');
 const FreelanceWorkController = require('./app/controllers/FreelanceWorkController');
 const HireController = require('./app/controllers/HireController');
+const ContractController = require('./app/controllers/ContractController');
 
 const routes = express.Router();
 
@@ -28,10 +29,13 @@ routes.post('/professional_profile/remove', ProfessionalProfileController.remove
 
 routes.post('/service', FreelanceWorkController.index);
 routes.post('/job/new', FreelanceWorkController.store);
+routes.post('/job/show', FreelanceWorkController.show);
 routes.post('/job/suggest_price', FreelanceWorkController.getMarketStatistics);
 
 routes.post('/job/hire', HireController.store);
 routes.post('/hires', HireController.showMyHires);
+
+routes.post('/contract/new', ContractController.store);
 
 routes.post('/bitpoint_recharge', UserController.bitpointRechargestore);
 

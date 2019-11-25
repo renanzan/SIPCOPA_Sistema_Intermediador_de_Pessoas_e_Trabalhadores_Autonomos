@@ -27,6 +27,15 @@ module.exports = {
         });
     },
 
+    async show(req, res) {
+        const { user_id:userId, job_id:jobId } = req.headers;
+
+        const professionalProfile = await ProfessionalProfile.findOne({ userId });
+        const job = await FreelanceWork.findOne({ _id: jobId });
+
+        return res.json({ professionalProfile, job });
+    },
+
     async index(req, res) {
         const perPage = (req.headers.perpage >= 1 && req.headers.perpage < 25) ? req.headers.perpage : 10;
         const page = (req.query.page >= 1) ? req.query.page : 1;
