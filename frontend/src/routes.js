@@ -10,6 +10,7 @@ import Service from './pages/Service/Service';
 import MyAccount from './pages/My Account/MyAccount';
 import NewJob from './pages/New Job/NewJob';
 import ContractJob from './pages/Contract Job/ContractJob';
+import History from './pages/History/History';
 
 export default function Routes() {
     return (
@@ -22,6 +23,7 @@ export default function Routes() {
                 <Route path='/my_account' component={MyAccount} />
                 <Route path='/new_job' component={NewJob} />
                 <Route path='/service/:userId/:jobId/contract' component={ContractJob} />
+                <Route path='/history' component={History} />
             {/* </Switch> */}
         </BrowserRouter>
     );

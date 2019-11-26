@@ -1,4 +1,5 @@
 const User = require('../database/models/User');
+const Job = require('../database/models/FreelanceWork');
 const Contract = require('../database/models/Contract');
 const Authenticator = require('../util/Authenticator');
 
@@ -31,6 +32,23 @@ module.exports = {
             });
         }
 
+        return res.json(contract);
+    },
+
+    async getHistory(req, res) {
+        const { id:employer } = await Authenticator.decode(req.headers.authentication);
+
+        const contracts = await Contract.find({ employer });
+
+        return res.json(contracts);
+    },
+
+    async changeStatus(req, res) {
+        const { authentication } = req.headers;
+        const { id:userId } = await Authenticator.decode(authentication);
+        const { contract:_id, status } = req.body;
+        
+        const contract = await Contract.findOneAndUpdate({ _id, employer: userId }, { status }, { new: true });
         return res.json(contract);
     }
 }

@@ -36,6 +36,8 @@ routes.post('/job/hire', HireController.store);
 routes.post('/hires', HireController.showMyHires);
 
 routes.post('/contract/new', ContractController.store);
+routes.post('/contract/history', ContractController.getHistory);
+routes.post('/contract/update', ContractController.changeStatus);
 
 routes.post('/bitpoint_recharge', UserController.bitpointRechargestore);
 
