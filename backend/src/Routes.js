@@ -21,6 +21,8 @@ routes.post('/auth/profile', AuthController.index);
 routes.post('/auth/forgot_password', AuthController.forgotPssword);
 routes.post('/auth/reset_password', AuthController.resetPassword);
 
+routes.post('/getUser', UserController.getUserById);
+
 routes.post('/professional_profile', ProfessionalProfileController.index);
 routes.post('/professional_profile/my', ProfessionalProfileController.myProfessionalProfile);
 routes.post('/professional_profile/new', ProfessionalProfileController.store);
@@ -31,6 +33,7 @@ routes.post('/service', FreelanceWorkController.index);
 routes.post('/job/new', FreelanceWorkController.store);
 routes.post('/job/show', FreelanceWorkController.show);
 routes.post('/job/suggest_price', FreelanceWorkController.getMarketStatistics);
+routes.post('/job/rate', FreelanceWorkController.rate);
 
 routes.post('/job/hire', HireController.store);
 routes.post('/hires', HireController.showMyHires);
@@ -38,6 +41,8 @@ routes.post('/hires', HireController.showMyHires);
 routes.post('/contract/new', ContractController.store);
 routes.post('/contract/history', ContractController.getHistory);
 routes.post('/contract/update', ContractController.changeStatus);
+routes.post('/contracts', ContractController.getMyContracts);
+routes.post('/contract/rate', ContractController.rate);
 
 routes.post('/bitpoint_recharge', UserController.bitpointRechargestore);
 

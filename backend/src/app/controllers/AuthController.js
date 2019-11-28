@@ -32,13 +32,15 @@ module.exports = {
     async register(req, res) {
         const { username, password, email } = req.body;
 
+        console.log(username + " - " + password + " - " + email);
+
         // Verificação: Redundancia de valor (username)
             const userExists = await User.find({
                 username
             });
 
             if(userExists.length > 0)
-                    return res.status(400).send({ error:"The username is already in use." });
+                    return res.send({ code:404, error:"The username is already in use." });
 
         // Verificação: Redundancia de valor (e-mail)
             const emailExists = await User.find({
@@ -46,7 +48,7 @@ module.exports = {
             });
 
             if(emailExists.length > 0)
-                return res.status(400).json({ error:"Email address is already in use." });
+                return res.json({ code:404, error:"Email address is already in use." });
 
         const user = await User.create({
             username,

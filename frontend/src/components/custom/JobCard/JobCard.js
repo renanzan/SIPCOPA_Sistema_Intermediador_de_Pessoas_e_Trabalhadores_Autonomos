@@ -1,7 +1,6 @@
 import React from 'react';
 
 import './job_card.css';
-
 import Like from '../../../assets/icons/like.svg';
 import Star from '../../../assets/icons/star.svg';
 
@@ -12,7 +11,6 @@ export default function JobCard({ job, history }) {
 
     return(
         <div style={styles.cardContainer} onMouseEnter={ e => { setHover(true); }} onMouseLeave={ e => { setHover(false); }}>
-            
             {
                 hover ?
                     <div style={styles.cardOverlap}>
@@ -36,7 +34,7 @@ export default function JobCard({ job, history }) {
                 <label style={styles.fullName}>{job.user_info.fullName}</label>
                 <div style={styles.rateContainer}>
                     <img src={Star} alt="star" width="20px" style={{ marginRight: '5px'}} />
-                    <label>{job.rate.$numberDecimal}</label>
+                    <label>{job.rate_weighted_average.$numberDecimal}</label>
                 </div>
                 <div style={styles.descriptionContainer}>
                     <label style={{ fontVariant:'small-caps', fontWeight:600, fontSize:'14px' }}>{(job.job)}</label>
@@ -46,7 +44,7 @@ export default function JobCard({ job, history }) {
                 </div>
                 <div style={styles.price}>{job.price} pontos</div>
             </div>
-        </div>
+        </div>  
     );
 }
 

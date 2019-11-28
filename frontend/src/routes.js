@@ -11,6 +11,7 @@ import MyAccount from './pages/My Account/MyAccount';
 import NewJob from './pages/New Job/NewJob';
 import ContractJob from './pages/Contract Job/ContractJob';
 import History from './pages/History/History';
+import ProfessionalProfileContracts from './pages/Professional Profile Contracts/ProfessionalProfileContracts';
 
 export default function Routes() {
     return (
@@ -24,6 +25,7 @@ export default function Routes() {
                 <Route path='/new_job' component={NewJob} />
                 <Route path='/service/:userId/:jobId/contract' component={ContractJob} />
                 <Route path='/history' component={History} />
+                <Route path='/professional_profile/contracts' component={ProfessionalProfileContracts} />
             {/* </Switch> */}
         </BrowserRouter>
     );

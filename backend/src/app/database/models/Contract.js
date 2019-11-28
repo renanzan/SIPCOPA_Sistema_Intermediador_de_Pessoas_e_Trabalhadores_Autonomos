@@ -4,7 +4,8 @@ const possibilityOfStatus = [
     'pending',
     'refused',
     'open',
-    'close'
+    'close',
+    'rated'
 ]
 
 const paymentMethodPossibilities = [
@@ -50,6 +51,9 @@ const ContractSchema = new Schema({
     },
     rate: {
         type: Schema.Types.Decimal128
+    },
+    comment: {
+        type: String
     }
 }, { timestamps: true });
 

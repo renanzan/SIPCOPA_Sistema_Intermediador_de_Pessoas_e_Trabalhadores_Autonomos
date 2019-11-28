@@ -30,8 +30,8 @@ module.exports = {
     async show(req, res) {
         const { user_id:userId, job_id:jobId } = req.headers;
 
-        const professionalProfile = await ProfessionalProfile.findOne({ userId });
-        const job = await FreelanceWork.findOne({ _id: jobId });
+        const job = await FreelanceWork.findOne({ _id: jobId }).select('+professionalProfileId');
+        const professionalProfile = await ProfessionalProfile.findOne({ _id:job.professionalProfileId });
 
         return res.json({ professionalProfile, job });
     },
@@ -99,6 +99,18 @@ module.exports = {
         }
     },
 
+    async rate(req, res) {
+        const { job_id:_id } = req.headers;
+        const { rate } = req.body;
+
+        const job = await FreelanceWork.findOne({ _id });
+
+        job.rate[`${rate}_star`] = job.rate[`${rate}_star`] + 1;
+        await job.save();
+
+        return res.json({ ok: true });
+    },
+
     async getMarketStatistics(req, res) {
         if(!req.body.job)
             return res.json({ code: 404, error: 'Falta parâmetros no header.' });
@@ -107,73 +119,73 @@ module.exports = {
 
         if(!service_possibilities.includes(job.toString()))
             return res.json({ code: 403, error: 'O parâmetro job não é uma opção válida.' });
-
+        
         const rate_range = ['0:1', '1:2', '2:3', '3:4', '4:5'];
         const smaller_price = [], biggest_price = [], partial_average = [], occurrences = [], average = [];
-        
+
         Promise.all([
-            await FreelanceWork.findOne({ job, rate: { '$gte': 0, '$lt': 1 } }, {}, { sort: { 'price' : 1 } }, function(err, job) {
+            await FreelanceWork.findOne({ job, rate_weighted_average: { '$gte': 0, '$lt': 1 } }, {}, { sort: { 'price' : 1 } }, function(err, job) {
                 (job) ? smaller_price.push(job.price) : smaller_price.push(-1);
             }),
 
-            await FreelanceWork.findOne({ job, rate: { '$gte': 0, '$lt': 1 } }, {}, { sort: { 'price' : -1 } }, function(err, job) {
+            await FreelanceWork.findOne({ job, rate_weighted_average: { '$gte': 0, '$lt': 1 } }, {}, { sort: { 'price' : -1 } }, function(err, job) {
                 (job) ? biggest_price.push(job.price) : biggest_price.push(-1);
             }),
 
-            await FreelanceWork.findOne({ job, rate: { '$gte': 1, '$lt': 2 } }, {}, { sort: { 'price' : 1 } }, function(err, job) {
+            await FreelanceWork.findOne({ job, rate_weighted_average: { '$gte': 1, '$lt': 2 } }, {}, { sort: { 'price' : 1 } }, function(err, job) {
                 (job) ? smaller_price.push(job.price) : smaller_price.push(-1);
             }),
 
-            await FreelanceWork.findOne({ job, rate: { '$gte': 1, '$lt': 2 } }, {}, { sort: { 'price' : -1 } }, function(err, job) {
+            await FreelanceWork.findOne({ job, rate_weighted_average: { '$gte': 1, '$lt': 2 } }, {}, { sort: { 'price' : -1 } }, function(err, job) {
                 (job) ? biggest_price.push(job.price) : biggest_price.push(-1);
             }),
 
-            await FreelanceWork.findOne({ job, rate: { '$gte': 2, '$lt': 3 } }, {}, { sort: { 'price' : 1 } }, function(err, job) {
+            await FreelanceWork.findOne({ job, rate_weighted_average: { '$gte': 2, '$lt': 3 } }, {}, { sort: { 'price' : 1 } }, function(err, job) {
                 (job) ? smaller_price.push(job.price) : smaller_price.push(-1);
             }),
 
-            await FreelanceWork.findOne({ job, rate: { '$gte': 2, '$lt': 3 } }, {}, { sort: { 'price' : -1 } }, function(err, job) {
+            await FreelanceWork.findOne({ job, rate_weighted_average: { '$gte': 2, '$lt': 3 } }, {}, { sort: { 'price' : -1 } }, function(err, job) {
                 (job) ? biggest_price.push(job.price) : biggest_price.push(-1);
             }),
 
-            await FreelanceWork.findOne({ job, rate: { '$gte': 3, '$lt': 4 } }, {}, { sort: { 'price' : 1 } }, function(err, job) {
+            await FreelanceWork.findOne({ job, rate_weighted_average: { '$gte': 3, '$lt': 4 } }, {}, { sort: { 'price' : 1 } }, function(err, job) {
                 (job) ? smaller_price.push(job.price) : smaller_price.push(-1);
             }),
 
-            await FreelanceWork.findOne({ job, rate: { '$gte': 3, '$lt': 4 } }, {}, { sort: { 'price' : -1 } }, function(err, job) {
+            await FreelanceWork.findOne({ job, rate_weighted_average: { '$gte': 3, '$lt': 4 } }, {}, { sort: { 'price' : -1 } }, function(err, job) {
                 (job) ? biggest_price.push(job.price) : biggest_price.push(-1);
             }),
 
-            await FreelanceWork.findOne({ job, rate: { '$gte': 4, '$lte': 5 } }, {}, { sort: { 'price' : 1 } }, function(err, job) {
+            await FreelanceWork.findOne({ job, rate_weighted_average: { '$gte': 4, '$lte': 5 } }, {}, { sort: { 'price' : 1 } }, function(err, job) {
                 (job) ? smaller_price.push(job.price) : smaller_price.push(-1);
             }),
 
-            await FreelanceWork.findOne({ job, rate: { '$gte': 4, '$lte': 5 } }, {}, { sort: { 'price' : -1 } }, function(err, job) {
+            await FreelanceWork.findOne({ job, rate_weighted_average: { '$gte': 4, '$lte': 5 } }, {}, { sort: { 'price' : -1 } }, function(err, job) {
                 (job) ? biggest_price.push(job.price) : biggest_price.push(-1);
             }),
 
-            await FreelanceWork.find({ job, rate: { '$gte': 0, '$lt': 1 } }).countDocuments(function(err, count) {
+            await FreelanceWork.find({ job, rate_weighted_average: { '$gte': 0, '$lt': 1 } }).countDocuments(function(err, count) {
                 occurrences.push(count);
             }),
 
-            await FreelanceWork.find({ job, rate: { '$gte': 1, '$lt': 2 } }).countDocuments(function(err, count) {
+            await FreelanceWork.find({ job, rate_weighted_average: { '$gte': 1, '$lt': 2 } }).countDocuments(function(err, count) {
                 occurrences.push(count);
             }),
 
-            await FreelanceWork.find({ job, rate: { '$gte': 2, '$lt': 3 } }).countDocuments(function(err, count) {
+            await FreelanceWork.find({ job, rate_weighted_average: { '$gte': 2, '$lt': 3 } }).countDocuments(function(err, count) {
                 occurrences.push(count);
             }),
 
-            await FreelanceWork.find({ job, rate: { '$gte': 3, '$lt': 4 } }).countDocuments(function(err, count) {
+            await FreelanceWork.find({ job, rate_weighted_average: { '$gte': 3, '$lt': 4 } }).countDocuments(function(err, count) {
                 occurrences.push(count);
             }),
 
-            await FreelanceWork.find({ job, rate: { '$gte': 4, '$lt': 5 } }).countDocuments(function(err, count) {
+            await FreelanceWork.find({ job, rate_weighted_average: { '$gte': 4, '$lt': 5 } }).countDocuments(function(err, count) {
                 occurrences.push(count);
             }),
 
             await FreelanceWork.aggregate([
-                { $match: {  job, rate: { '$gte': 0, '$lte': 1 } } },
+                { $match: {  job, rate_weighted_average: { '$gte': 0, '$lt': 1 } } },
                 { $group: {
                     _id: '0-1',
                     sum: { $sum: '$price'}
@@ -186,7 +198,7 @@ module.exports = {
             }),
 
             await FreelanceWork.aggregate([
-                { $match: {  job, rate: { '$gte': 1, '$lte': 2 } } },
+                { $match: {  job, rate_weighted_average: { '$gte': 1, '$lt': 2 } } },
                 { $group: {
                     _id: '1-2',
                     sum: { $sum: '$price'}
@@ -199,7 +211,7 @@ module.exports = {
             }),
 
             await FreelanceWork.aggregate([
-                { $match: {  job, rate: { '$gte': 2, '$lte': 3 } } },
+                { $match: {  job, rate_weighted_average: { '$gte': 2, '$lt': 3 } } },
                 { $group: {
                     _id: '2-3',
                     sum: { $sum: '$price'}
@@ -212,7 +224,7 @@ module.exports = {
             }),
 
             await FreelanceWork.aggregate([
-                { $match: {  job, rate: { '$gte': 3, '$lte': 4 } } },
+                { $match: {  job, rate_weighted_average: { '$gte': 3, '$lt': 4 } } },
                 { $group: {
                     _id: '3-4',
                     sum: { $sum: '$price'}
@@ -225,7 +237,7 @@ module.exports = {
             }),
 
             await FreelanceWork.aggregate([
-                { $match: {  job, rate: { '$gte': 4, '$lte': 5 } } },
+                { $match: {  job, rate_weighted_average: { '$gte': 4, '$lte': 5 } } },
                 { $group: {
                     _id: '4-5',
                     sum: { $sum: '$price'}
@@ -236,7 +248,6 @@ module.exports = {
                 else
                     average.push(-1);
             })
-
         ]);
 
         for(var count=0; count<rate_range.length; count++)

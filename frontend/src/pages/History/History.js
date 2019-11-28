@@ -3,6 +3,10 @@ import React from 'react';
 import './history.css';
 import api from '../../services/api';
 
+import Star from '../../assets/icons/star.svg';
+import StarOff from '../../assets/icons/star-off.svg';
+import TextField from '@material-ui/core/TextField';
+
 export default function History() {
     return(
         <div className='main-container'>
@@ -65,14 +69,11 @@ const JobCard = ({ contract }) => {
             })();
     }, [loading]);
 
-    function handleCancelar() {
+    function handleUpdateContractStatus(status) {
         api.post('/contract/update', {
             contract: contract._id,
-            status:'refused'
-        }, {
-            headers: {
-                authentication: localStorage.getItem('@sipcopa/token')
-            }
+            my_professional_profile_id: professionalProfile._id,
+            status
         });
 
         window.location.reload();
@@ -86,7 +87,7 @@ const JobCard = ({ contract }) => {
             {
                 loading ? <div>loading</div> :
                 <div style={{ background:'white', margin:'10px', display:'flex', flexDirection:'column', width:'300px', minHeight:'200px', padding:'10px', borderRadius:'4px', boxShadow:'0 0 5px rgba(0, 0, 0, 0.25)' }}>
-                    <label style={{ alignSelf:'flex-end', fontSize:'12px', color:'rgba(0, 0, 0, 0.35)' }}>{ `${String(createdAt.getDate()).padStart(2, '0')}/${createdAt.getMonth()}/${createdAt.getFullYear()} ${String(createdAt.getHours()).padStart(2, '0')}:${String(createdAt.getMinutes()).padStart(2, '0')}:${String(createdAt.getSeconds()).padStart(2, '0')}` }</label>
+                    <label style={{ alignSelf:'flex-end', fontSize:'12px', color:'rgba(0, 0, 0, 0.35)' }}>{ `${String(createdAt.getDate()).padStart(2, '0')}/${createdAt.getMonth()+1}/${createdAt.getFullYear()} ${String(createdAt.getHours()).padStart(2, '0')}:${String(createdAt.getMinutes()).padStart(2, '0')}:${String(createdAt.getSeconds()).padStart(2, '0')}` }</label>
                     <div style={{ display:'flex', flexDirection:'column', margin:'10px 0' }}>
                         <label style={{ fontWeight:600, alignSelf:'center' }}>{ job.job }</label>
                         <label style={{ fontSize:'14px', color:'rgba(0, 0, 0, 0.8)', alignSelf:'center' }}>{ professionalProfile.fullName }</label>
@@ -104,11 +105,15 @@ const JobCard = ({ contract }) => {
                                 <label style={{ fontSize:'14px', color:'rgba(0, 0, 0, 0.8)', backgroundColor:'yellow', padding:'0 10px' }}>pendente</label>
                             : contract.status === 'refused' ?
                                 <label style={{ fontSize:'14px', color:'rgba(0, 0, 0, 0.8)', backgroundColor:'red', padding:'0 10px' }}>cancelado</label>
+                            : contract.status === 'open' ?
+                                <label style={{ fontSize:'14px', color:'rgba(0, 0, 0, 0.8)', backgroundColor:'green', padding:'0 10px' }}>aberto</label>
+                            : contract.status === 'close' ?
+                                <label style={{ fontSize:'14px', color:'rgba(0, 0, 0, 0.8)' }}>concluido</label>
                             :
                                 <label style={{ fontSize:'14px', color:'rgba(0, 0, 0, 0.8)' }}>{ contract.status }</label>
                         }
                             <span className="tooltiptext">
-                                { `${String(updatedAt.getDate()).padStart(2, '0')}/${updatedAt.getMonth()}/${updatedAt.getFullYear()} ${String(updatedAt.getHours()).padStart(2, '0')}:${String(updatedAt.getMinutes()).padStart(2, '0')}:${String(updatedAt.getSeconds()).padStart(2, '0')}` }
+                                { `${String(updatedAt.getDate()).padStart(2, '0')}/${updatedAt.getMonth()+1}/${updatedAt.getFullYear()} ${String(updatedAt.getHours()).padStart(2, '0')}:${String(updatedAt.getMinutes()).padStart(2, '0')}:${String(updatedAt.getSeconds()).padStart(2, '0')}` }
                             </span>
                         </div>
                     </div>
@@ -117,21 +122,153 @@ const JobCard = ({ contract }) => {
                         contract.status === 'refused' ? null :
                             contract.status === 'pending' ?
                                 <div style={{ display:'flex', flexDirection:'column', flex:1, justifyContent:'flex-end' }}>
-                                    <input type='submit' value='Cancelar' onClick={ handleCancelar } />
+                                    <input type='submit' value='Cancelar' onClick={ e => handleUpdateContractStatus('refused') } />
                                 </div>
+                            : contract.status === 'close' ?
+                                <ServiceRating contract={contract} />
                             :
-                                <div style={{ display:'flex', justifyContent:'space-between', marginBottom:'20px' }}>
-                                    <label style={{ fontSize:'14px', color:'rgba(0, 0, 0, 0.35)' }}>Avalie o serviço</label>
-                                    <div style={{ display:'flex', flexDirection:'row' }}>
-                                        <input type='submit' value='X' />
-                                        <input type='submit' value='X' />
-                                        <input type='submit' value='X' />
-                                        <input type='submit' value='X' />
-                                        <input type='submit' value='X' />
-                                    </div>
+                                <div style={{ display:'flex', flexDirection:'column', flex:1, justifyContent:'flex-end' }}>
+                                    <input type='submit' value='Confirmar conclusão do serviço' onClick={ e => handleUpdateContractStatus('close') } />
                                 </div>
                     }
                 </div>
+            }
+        </div>
+    );
+}
+
+const ServiceRating = ({ contract }) => {
+    const [comment, setComment] = React.useState();
+    const [rate, setRate] = React.useState(1);
+
+    function handleRate(rateValue) {
+        setRate(rateValue);
+    }
+
+    function handleSendHate() {
+        (async() => {
+            await api.post('/contract/rate', {
+                contractId: contract._id,
+                rate,
+                comment
+            }, {
+                headers: {
+                    authentication: localStorage.getItem('@sipcopa/token')
+                }
+            }).then(response => {
+                console.log(response);
+
+                window.location.reload();
+            });
+        })();
+    }
+
+    return(
+        <div>
+            <hr style={{ borderTop:'1px solid #FBFBFD', margin:'10px 0' }} />
+
+            {
+                contract.rate ?
+                    <div>Avaliado
+
+                        <div style={{ display:'flex', justifyContent:'space-between' }}>
+                            <label style={{ fontSize:'14px', color:'rgba(0, 0, 0, 0.35)' }}>Sua avaliação</label>
+                            <div style={{ display:'flex', flexDirection:'row' }}>
+                                {
+                                    contract.rate.$numberDecimal >= 1 ?
+                                        <img src={Star} width='20px' style={{ marginRight:'5px' }} />
+                                    :
+                                        <img src={StarOff} width='20px' style={{ marginRight:'5px' }} />
+                                }
+                                {
+                                    contract.rate.$numberDecimal >= 2 ?
+                                        <img src={Star} width='20px' style={{ marginRight:'5px' }} />
+                                    :
+                                        <img src={StarOff} width='20px' style={{ marginRight:'5px' }} />
+                                }
+                                {
+                                    contract.rate.$numberDecimal >= 3 ?
+                                        <img src={Star} width='20px' style={{ marginRight:'5px' }} />
+                                    :
+                                        <img src={StarOff} width='20px' style={{ marginRight:'5px' }} />
+                                }
+                                {
+                                    contract.rate.$numberDecimal >= 4 ?
+                                        <img src={Star} width='20px' style={{ marginRight:'5px' }} />
+                                    :
+                                        <img src={StarOff} width='20px' style={{ marginRight:'5px' }} />
+                                }
+                                {
+                                    contract.rate.$numberDecimal >= 5 ?
+                                        <img src={Star} width='20px' style={{ marginRight:'5px' }} />
+                                    :
+                                        <img src={StarOff} width='20px' style={{ marginRight:'5px' }} />
+                                }
+                            </div>
+                        </div>
+
+                        {
+                            contract.comment ?
+                                <div style={{ display:'flex', justifyContent:'space-between', marginTop:'10px' }}>
+                                    <label style={{ fontSize:'14px', color:'rgba(0, 0, 0, 0.35)' }}>Seu comentário</label>
+                                    <label style={{ fontSize:'14px' }}>{contract.comment}</label>
+                                </div>
+                            :
+                                null
+                        }
+
+                    </div>
+                :
+                    <div>
+                        <div style={{ display:'flex', justifyContent:'space-between' }}>
+                            <label style={{ fontSize:'14px', color:'rgba(0, 0, 0, 0.35)' }}>Avalie o serviço</label>
+                            <div style={{ display:'flex', flexDirection:'row' }}>
+                                {
+                                    rate >= 1 ?
+                                        <img src={Star} width='20px' onClick={e => handleRate(1)} style={{ cursor:'pointer', marginRight:'5px' }} />
+                                    :
+                                        <img src={StarOff} width='20px' onClick={e => handleRate(1)} style={{ cursor:'pointer', marginRight:'5px' }} />
+                                }
+                                {
+                                    rate >= 2 ?
+                                        <img src={Star} width='20px' onClick={e => handleRate(2)} style={{ cursor:'pointer', marginRight:'5px' }} />
+                                    :
+                                        <img src={StarOff} width='20px' onClick={e => handleRate(2)} style={{ cursor:'pointer', marginRight:'5px' }} />
+                                }
+                                {
+                                    rate >= 3 ?
+                                        <img src={Star} width='20px' onClick={e => handleRate(3)} style={{ cursor:'pointer', marginRight:'5px' }} />
+                                    :
+                                        <img src={StarOff} width='20px' onClick={e => handleRate(3)} style={{ cursor:'pointer', marginRight:'5px' }} />
+                                }
+                                {
+                                    rate >= 4 ?
+                                        <img src={Star} width='20px' onClick={e => handleRate(4)} style={{ cursor:'pointer', marginRight:'5px' }} />
+                                    :
+                                        <img src={StarOff} width='20px' onClick={e => handleRate(4)} style={{ cursor:'pointer', marginRight:'5px' }} />
+                                }
+                                {
+                                    rate >= 5 ?
+                                        <img src={Star} width='20px' onClick={e => handleRate(5)} style={{ cursor:'pointer' }} />
+                                    :
+                                        <img src={StarOff} width='20px' onClick={e => handleRate(5)} style={{ cursor:'pointer'}} />
+                                }
+                            </div>
+                        </div>
+
+                        <TextField
+                            id="outlined-basic"
+                            label="Algum comentário?"
+                            multiline
+                            value={comment}
+                            onChange={e => { setComment(e.target.value); }}
+                            rows="1"
+                            rowsMax="3"
+                            margin="normal"
+                            variant="outlined" />
+                        
+                        <input type='submit' value='Enviar avaliação' onClick={e => handleSendHate() } />
+                    </div>
             }
         </div>
     );

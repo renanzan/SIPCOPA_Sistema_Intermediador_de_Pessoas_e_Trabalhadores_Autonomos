@@ -135,6 +135,7 @@ const ProfessionalProfileInfo = ({ history, currentJob, setCurrentJob, user, pro
                         <li onClick={() => { setEditProfessionalProfile(true) }}>Editar</li>
                         <li onClick={() => handleDelete()}>Deletar</li>
                         <li onClick={() => { history.push('/new_job'); }}>Novo trabalho</li>
+                        <li onClick={() => { history.push('/professional_profile/contracts'); }}>Contratos</li>
                     </ul>
                     <div className="cardAccountInfo">
                         <UserInfo currentJob={currentJob} setCurrentJob={setCurrentJob} professionalProfile={professionalProfile} />
@@ -164,7 +165,7 @@ const ProfessionalProfileInfo = ({ history, currentJob, setCurrentJob, user, pro
                             <div style={styles.jobCardFooter}>
                                 <div style={styles.infoCard} className="unselectable">
                                     <img src={Star} style={{ width: '25px' }} />
-                                    {professionalProfile.jobs[currentJob].rate.$numberDecimal}
+                                    {professionalProfile.jobs[currentJob].rate_weighted_average.$numberDecimal}
                                 </div>                    
                                 <div style={styles.infoCard} className="unselectable">
                                     <img src={Coin} style={{ width: '25px' }} />

@@ -42,6 +42,8 @@ export default function CalculatorDialog({ job, setPrice }) {
             (async () => {
                 setLoading(true);
 
+                console.log('TESTE');
+
                 await api.post('/job/suggest_price', { job }).then(response => {
                     if(response.data) {
                         const { data } = response;
@@ -61,11 +63,12 @@ export default function CalculatorDialog({ job, setPrice }) {
                             );
                         }
 
+                        console.log(response.data);
+
                         setRows(tempRows);
+                        setLoading(false);
                     }
                 });
-                
-                setLoading(false);
             })();
     }, [job]);
 
@@ -186,8 +189,8 @@ const PricesTable = ({ job, rows }) => {
                 <TableRow>
                 <TableCell>Avaliação</TableCell>
                 <TableCell align="right">Ocorrencia</TableCell>
-                <TableCell align="right">Mínimo&nbsp;(bp)</TableCell>
-                <TableCell align="right">Máximo&nbsp;(bp)</TableCell>
+                <TableCell align="right">Menor&nbsp;(bp)</TableCell>
+                <TableCell align="right">Maior&nbsp;(bp)</TableCell>
                 <TableCell align="right">Média P.&nbsp;(bp)</TableCell>
                 <TableCell align="right">Média&nbsp;(bp)</TableCell>
                 </TableRow>

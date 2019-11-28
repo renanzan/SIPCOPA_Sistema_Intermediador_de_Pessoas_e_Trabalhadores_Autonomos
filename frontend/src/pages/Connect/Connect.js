@@ -1,18 +1,22 @@
 import React, { useState } from 'react';
 
 import api from '../../services/api';
-import { login, logout, isAuthenticated } from '../../services/auth'
+import { login, register, isAuthenticated } from '../../services/auth'
 
 import { InputText } from '../../components/custom/Input';
 import Decorartion from '../../assets/decorations.svg';
 
-const handleLogin = async (history, username, password) => {
+const handleLogin = async(history, username, password) => {
     login(username, password, history, (err) => {
         console.log(err);
     });
 }
 
-
+const handleCreateAccount = async(history, username, password, email) => {
+    register(username, password, email, history, (err) => {
+        console.log(err);
+    });
+}
 
 export default function Connect({ history }) {
     const [state, setState] = useState(0);
@@ -26,7 +30,7 @@ export default function Connect({ history }) {
                 {
                     state === 0 ?
                         <Login history={history} setState={setState} /> :
-                    <Register setState={setState} />
+                    <Register history={history} setState={setState} />
                 }
                 <img className="decoration" src={Decorartion} alt="decoration" />
             {/* </div> */}
@@ -58,7 +62,7 @@ const Login = ({ history, setState }) => {
     );
 }
 
-const Register = ({ setState }) => {
+const Register = ({ history, setState }) => {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -79,7 +83,7 @@ const Register = ({ setState }) => {
                 <InputText value='E-mail' placeholder='Digite seu e-mail' useState={email} setState={setEmail} style={{ marginTop: 20 }} />
                 <InputText type='password' value='Senha Secreta' placeholder='Digite sua senha secreta' useState={password} setState={setPassword} style={{ marginTop: 20 }} />
                 <InputText type='password' value='Confirme sua senha secreta' placeholder='Digite novamente sua senha secreta' useState={confirmPassword} setState={setConfirmPassword} style={{ marginTop: 20 }} />
-                <button style={{ alignSelf: 'flex-end', marginTop:'60px' }}>Concluir cadastro</button>
+                <button style={{ alignSelf: 'flex-end', marginTop:'60px' }} onClick={e => { handleCreateAccount(history, username, password, email)}}>Concluir cadastro</button>
             </div>
         </div>
     );

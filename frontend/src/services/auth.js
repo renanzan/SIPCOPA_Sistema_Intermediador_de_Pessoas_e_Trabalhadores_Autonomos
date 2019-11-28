@@ -40,6 +40,28 @@ export async function login(username, password, history, onError) {
     });
 };
 
+export async function register(username, password, email, history, onError) {
+    await api.post('/auth/register', {
+        username,
+        password,
+        email
+    }, {
+        "Content-Type": 'application/json'
+    })
+    .then(response => {
+        const { token } = response.data;
+
+        LocalStorageToken.set(LocalStorageToken.keyItemName.token, token);
+
+        Authenticated = true;
+
+        history.push('/service');
+    })
+    .catch(error => {
+        onError(error);
+    });
+};
+
 export function logout(history) {
     LocalStorageToken.remove(LocalStorageToken.keyItemName.token);
 
