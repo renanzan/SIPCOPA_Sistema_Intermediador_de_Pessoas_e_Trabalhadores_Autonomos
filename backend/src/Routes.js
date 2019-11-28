@@ -24,10 +24,13 @@ routes.post('/auth/reset_password', AuthController.resetPassword);
 routes.post('/getUser', UserController.getUserById);
 
 routes.post('/professional_profile', ProfessionalProfileController.index);
+routes.post('/professional_profile/get', ProfessionalProfileController.get);
+routes.post('/professional_profile/getByUser', ProfessionalProfileController.getByUser);
 routes.post('/professional_profile/my', ProfessionalProfileController.myProfessionalProfile);
 routes.post('/professional_profile/new', ProfessionalProfileController.store);
 routes.post('/professional_profile/update', ProfessionalProfileController.update);
 routes.post('/professional_profile/remove', ProfessionalProfileController.remove);
+routes.post('/professional_profile/like', ProfessionalProfileController.like);
 
 routes.post('/service', FreelanceWorkController.index);
 routes.post('/job/new', FreelanceWorkController.store);

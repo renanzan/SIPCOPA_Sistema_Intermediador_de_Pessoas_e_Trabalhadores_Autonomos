@@ -4,6 +4,7 @@ import { isAuthenticated, logout, getUser } from '../../services/auth'
 
 import './Header.css';
 import Coin from '../../assets/icons/coin.svg';
+import api from '../../services/api';
 
 const handleLogout = (history) => {
     logout(history);
@@ -118,7 +119,9 @@ const TopNavigation = ({ pathname, history }) => {
         }
 
         return path;
-    }
+    };
+
+    getNavigationPath();
 
     return(
         <div className="top-navigation" style={ !(pathname.toUpperCase().startsWith('/SERVICE')) ? { visibility:'hidden' } : null }>
@@ -127,24 +130,68 @@ const TopNavigation = ({ pathname, history }) => {
                     if(index !== navigationPath.length - 1)
                         return(
                             <label key={index}>
-                                <label className="selectable" onClick={() => { history.push(getNavigationPath(index)) }}>
-                                    {element}
-                                </label>
-
+                                <Shrotcut history={history} index={index} element={element} getNavigationPath={getNavigationPath} />
                                 <label style={{ margin:'0 20px'}}>/</label>
                             </label>
                         );
                     else
                         return(
                             <label key={index}>
-                                <label style={{ color:'#2AABCC' }} className="selectable" onClick={() => { history.push(getNavigationPath(index)) }} >
+                                {/* <label style={{ color:'#2AABCC' }} className="selectable" onClick={() => { history.push(getNavigationPath(index)) }} >
                                     {element}
-                                </label>
+                                </label> */}
+                                <Shrotcut selected history={history} index={index} element={element} getNavigationPath={getNavigationPath} />
                             </label>
                         );
                 })
             }
         </div>
+    );
+}
+
+const Shrotcut = ({ selected, history, element, index,getNavigationPath }) => {
+    const [loading, setLoading] = React.useState(true);
+    const [shortcut, setShortcut] = React.useState(element);
+
+    React.useEffect(() => {
+        if(shortcut !== 'service' && shortcut !== 'contract') {
+            (async() => {
+                api.post('/professional_profile/getByUser', {}, {
+                    headers: {
+                        professional_profile_id: element
+                    }
+                }).then(response => {
+                    if(response.data) {
+                        setShortcut(response.data.fullName);
+                        setLoading(false);
+                    }
+                });
+
+                api.post('/job/show', {}, {
+                    headers: {
+                        job_id: element
+                    }
+                }).then(response => {
+                    if(response.data.job) {
+                        setShortcut(response.data.job.job);
+                        setLoading(false);
+                    }
+                });
+            })();
+        } else
+            setLoading(false);
+    }, []);
+    
+    return(
+        <>
+        {
+            loading ? 'loading' :
+                selected ?
+                    <label style={{ color:'#2AABCC' }} className="selectable" onClick={() => {  }} >{shortcut}</label>
+                :
+                    <label className="selectable" onClick={() => { history.push(getNavigationPath(index)) }}>{shortcut}</label>
+        }
+        </>
     );
 }
 

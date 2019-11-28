@@ -88,8 +88,8 @@ export default function Service ({ history }) {
 
     return(
         <div className='main-container'>
-            <button onClick={ e => handleChangePage('NEXT') }>NEXT</button>
-            <button onClick={ e => handleChangePage() }>PREV</button>
+            {/* <button onClick={ e => handleChangePage('NEXT') }>NEXT</button>
+            <button onClick={ e => handleChangePage() }>PREV</button> */}
             
             <SearchContainer history={history} currentPage={page} search={search} setSearch={setSearch} jobs={jobs} reload={reload} setReload={setReload} />
             <div className="list-container">
@@ -106,7 +106,7 @@ export default function Service ({ history }) {
                     <List jobs={jobs} history={history} />
                 }
             </div>
-            <Footer />
+            {/* <Footer /> */}
         </div>
     );
 }

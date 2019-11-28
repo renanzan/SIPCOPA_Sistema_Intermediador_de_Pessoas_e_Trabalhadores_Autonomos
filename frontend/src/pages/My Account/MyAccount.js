@@ -188,7 +188,7 @@ const UserInfo = ({ currentJob, setCurrentJob, professionalProfile }) => {
         <div style={styles.userInfoContainer}>
             <img src={TempImage} style={styles.profilePhoto} className="unselectable"/>
             <div style={styles.infoContainer} >
-                <div style={styles.likesContainer} className="unselectable">+{professionalProfile.professionalProfile.likes} likes</div>
+                <div style={styles.likesContainer} className="unselectable">+{professionalProfile.professionalProfile.likes.length} likes</div>
                 <div style={styles.profileFullName}>{professionalProfile.professionalProfile.fullName}</div>
                 <div style={styles.biography}>{professionalProfile.professionalProfile.biography}</div>
                 <div style={styles.tagJobsContainer}>
@@ -231,14 +231,14 @@ const DontHaveProfessionalProfile = ({ title, createAccount, fieldValues, positi
 }
 
 const CreateProfissionalProfile = ({ title, fieldValues, positiveButtonValue, positiveButtonOnClick, negativeButton, negativeButtonValue, negativeButtonOnClick }) => {
-    const[name, setName] = useState('');
-    const[biography, setBiography] = useState('');
-    const[phoneNumber, setPhoneNumber] = useState('');
-    const[state, setState] = useState('');
-    const[city, setCity] = useState('');
-    const[district, setDistrict] = useState('');
-    const[street, setStreet] = useState('');
-    const[number, setNumber] = useState('');
+    const[name, setName] = useState('Renan Henrique Zanoti');
+    const[biography, setBiography] = useState('Eu sei programar.');
+    const[phoneNumber, setPhoneNumber] = useState('999999999');
+    const[state, setState] = useState('MG');
+    const[city, setCity] = useState('Joao Monlevade');
+    const[district, setDistrict] = useState('Cruzeiro Celeste');
+    const[street, setStreet] = useState('Avenida Armando Fajardo');
+    const[number, setNumber] = useState('3733');
 
     async function handleCreateProfissionalProfile() {
         const response = await api.post('/professional_profile/new', {

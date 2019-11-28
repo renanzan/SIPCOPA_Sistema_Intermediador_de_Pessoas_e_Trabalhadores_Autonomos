@@ -28,7 +28,7 @@ export default function JobCard({ job, history }) {
             <div style={hover ? Object.assign({}, styles.cardContent, styles.cardContentBlur) : styles.cardContent}>
                 <div style={styles.likeContainer}>
                     <img src={Like} alt="like" width="30px"/>
-                    <label style={styles.labelLikes}>+{job.user_info.likes}</label>
+                    <label style={styles.labelLikes}>+{job.user_info.likes.length}</label>
                 </div>
                 <img style={styles.photo} src={TempImage} alt="profile image" />
                 <label style={styles.fullName}>{job.user_info.fullName}</label>

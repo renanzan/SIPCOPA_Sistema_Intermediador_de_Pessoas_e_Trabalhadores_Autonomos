@@ -28,12 +28,16 @@ module.exports = {
     },
 
     async show(req, res) {
-        const { user_id:userId, job_id:jobId } = req.headers;
+        const { job_id:jobId } = req.headers;
 
         const job = await FreelanceWork.findOne({ _id: jobId }).select('+professionalProfileId');
-        const professionalProfile = await ProfessionalProfile.findOne({ _id:job.professionalProfileId });
+        
+        var professionalProfile;
+        
+        if(job)
+            professionalProfile = await ProfessionalProfile.findOne({ _id:job.professionalProfileId });
 
-        return res.json({ professionalProfile, job });
+        return res.json({ job, professionalProfile });
     },
 
     async index(req, res) {

@@ -1,7 +1,7 @@
 const Nominatim = require('../../services/Nominatim');
 const Authenticator = require('../util/Authenticator');
 
-const ProfissionalProfile = require('../database/models/ProfessionalProfile');
+const ProfessionalProfile = require('../database/models/ProfessionalProfile');
 const FreelanceWork = require('../database/models/FreelanceWork');
 
 const index = async (req, res) => {
@@ -13,6 +13,22 @@ const index = async (req, res) => {
     } catch(err) {
         return res.json({ err });
     }
+}
+
+const get = async (req, res) => {
+    const { professional_profile_id } = req.headers;
+
+    const professionalProfile = await ProfessionalProfile.findOne({ _id: professional_profile_id });
+
+    return res.json(professionalProfile);
+}
+
+const getByUser = async (req, res) => {
+    const { professional_profile_id } = req.headers;
+
+    const professionalProfile = await ProfessionalProfile.findOne({ userId: professional_profile_id });
+
+    return res.json(professionalProfile);
 }
 
 const myProfessionalProfile = async (req, res) => {
@@ -43,7 +59,7 @@ const store = async (req, res) => {
                     return result.coordinates;
                 });
 
-            const profissionalProfile = await ProfissionalProfile.create({
+            const profissionalProfile = await ProfessionalProfile.create({
                 userId,
                 urlPhoto: url_photo,
                 fullName: full_name,
@@ -103,7 +119,7 @@ const update = async (req, res) => {
                 objForUpdate.address.coordinates.lat = lat;
                 objForUpdate.address.coordinates.lon = lon;
 
-                const profissionalProfileUpdated = await ProfissionalProfile.findOneAndUpdate({ userId }, objForUpdate, { new: true });
+                const profissionalProfileUpdated = await ProfessionalProfile.findOneAndUpdate({ userId }, objForUpdate, { new: true });
 
                 return res.json(profissionalProfileUpdated);
             } catch(err) {
@@ -120,11 +136,35 @@ const remove = async (req, res) => {
 
     const { id:userId } = await Authenticator.decode(authentication);
     
-    await ProfissionalProfile.deleteOne({ userId });
+    await ProfessionalProfile.deleteOne({ userId });
 
     // ProfissionalProfile.removeProfessionalProfile(userId);
 
     return res.json();
+}
+
+const like = async(req, res) => {
+    const { authentication, professional_profile_id } = req.headers;
+    const { id:userId } = await Authenticator.decode(authentication);
+
+    const professionalProfile = await ProfessionalProfile.findOne({ _id:professional_profile_id });
+
+    if(professionalProfile) {
+        if(!professionalProfile.likes.includes(userId))
+            professionalProfile.likes.push(userId);
+        else {
+            for(var i=0; professionalProfile.likes.length > i; i++) {
+                if(professionalProfile.likes[i] == userId) {
+                    professionalProfile.likes.splice(i, 1);
+                    break;
+                }
+            }
+        }
+    
+        professionalProfile.save();
+    }
+
+    return res.json(professionalProfile);
 }
 
 const checkIfHaveProfessionalProfile = async (authentication) => {
@@ -139,7 +179,7 @@ const checkIfHaveProfessionalProfile = async (authentication) => {
 const getProfessionalProfile = async (authentication) => {
     const { id:userId } = await Authenticator.decode(authentication);
 
-    const profissionalProfile = await ProfissionalProfile.findOne({
+    const profissionalProfile = await ProfessionalProfile.findOne({
         userId
     });
 
@@ -151,8 +191,11 @@ module.exports = {
     checkIfHaveProfessionalProfile,
 
     index,
+    get,
+    getByUser,
     myProfessionalProfile,
     store,
     update,
-    remove
+    remove,
+    like
 }

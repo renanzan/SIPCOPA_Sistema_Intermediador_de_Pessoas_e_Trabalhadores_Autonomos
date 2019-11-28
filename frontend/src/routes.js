@@ -26,6 +26,20 @@ export default function Routes() {
                 <Route path='/service/:userId/:jobId/contract' component={ContractJob} />
                 <Route path='/history' component={History} />
                 <Route path='/professional_profile/contracts' component={ProfessionalProfileContracts} />
+                <Route exact path='/service/:professional_profile_id' component={() => {
+                    return(
+                        <div>
+                            Ver trabalhador
+                        </div>
+                    );
+                }} />
+                <Route exact path='/service/:professional_profile_id/:job_id' component={() => {
+                    return(
+                        <div>
+                            Ver trabalho
+                        </div>
+                    );
+                }} />
             {/* </Switch> */}
         </BrowserRouter>
     );
