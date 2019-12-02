@@ -2,6 +2,7 @@ const Nominatim = require('../../services/Nominatim');
 const Authenticator = require('../util/Authenticator');
 
 const ProfessionalProfile = require('../database/models/ProfessionalProfile');
+const User = require('../database/models/User');
 const FreelanceWork = require('../database/models/FreelanceWork');
 
 const index = async (req, res) => {
@@ -28,7 +29,14 @@ const getByUser = async (req, res) => {
 
     const professionalProfile = await ProfessionalProfile.findOne({ userId: professional_profile_id });
 
-    return res.json(professionalProfile);
+    const user = await User.findOne({ _id: professional_profile_id });
+
+    var jobs;
+
+    if(professionalProfile)
+        jobs = await FreelanceWork.find({ professionalProfileId: professionalProfile._id });
+
+    return res.json({ user, professionalProfile, jobs });
 }
 
 const myProfessionalProfile = async (req, res) => {
@@ -167,6 +175,22 @@ const like = async(req, res) => {
     return res.json(professionalProfile);
 }
 
+const liked = async(req, res) => {
+    // const { authentication, professional_profile_id } = req.headers;
+    // const { id:userId } = await Authenticator.decode(authentication);
+
+    // console.log(`${userId} - ${professional_profile_id}`);
+
+    // const verify = await FreelanceWork.findOne({ _id: professional_profile_id, likes: userId });
+    
+    return res.json({ ok:true });
+
+    // if(verify)
+    //     return true;
+    // else
+    //     return false;
+}
+
 const checkIfHaveProfessionalProfile = async (authentication) => {
     const professionalProfile = await getProfessionalProfile(authentication);
 
@@ -197,5 +221,6 @@ module.exports = {
     store,
     update,
     remove,
-    like
+    like,
+    liked
 }

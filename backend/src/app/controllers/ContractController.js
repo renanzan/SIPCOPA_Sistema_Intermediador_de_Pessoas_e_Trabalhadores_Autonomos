@@ -54,6 +54,14 @@ module.exports = {
         return res.json(contracts);
     },
 
+    async getContractsByJobId(req, res) {
+        const { job_id } = req.headers;
+
+        const contracts = await Contract.find({ job: job_id });
+
+        return res.json(contracts);
+    },
+
     async changeStatus(req, res) {
         const { authentication } = req.headers;
         const { contract:_id, status } = req.body;

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 import { isAuthenticated, logout, getUser } from '../../services/auth'
 
-import './Header.css';
+import './header.css';
 import Coin from '../../assets/icons/coin.svg';
 import api from '../../services/api';
 
@@ -161,8 +161,8 @@ const Shrotcut = ({ selected, history, element, index,getNavigationPath }) => {
                         professional_profile_id: element
                     }
                 }).then(response => {
-                    if(response.data) {
-                        setShortcut(response.data.fullName);
+                    if(response.data.professionalProfile) {
+                        setShortcut(response.data.professionalProfile.fullName);
                         setLoading(false);
                     }
                 });

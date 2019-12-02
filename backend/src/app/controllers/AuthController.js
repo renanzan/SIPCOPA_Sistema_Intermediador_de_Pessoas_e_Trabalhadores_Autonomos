@@ -142,6 +142,13 @@ module.exports = {
         sendMailPasswordChangeNotification(email);
 
         return res.send();
+    },
+
+    async getId(req, res) {
+        const { token } = req.headers;
+        const { id:_id } = await Authenticator.decode(token);
+        
+        return res.json({ _id });
     }
 
 }

@@ -12,6 +12,8 @@ import NewJob from './pages/New Job/NewJob';
 import ContractJob from './pages/Contract Job/ContractJob';
 import History from './pages/History/History';
 import ProfessionalProfileContracts from './pages/Professional Profile Contracts/ProfessionalProfileContracts';
+import ProfissionalProfilePage from './pages/Professional Profile Page/ProfessionalProfilePage';
+import JobPage from './pages/Job Page/JobPage';
 
 export default function Routes() {
     return (
@@ -26,20 +28,8 @@ export default function Routes() {
                 <Route path='/service/:userId/:jobId/contract' component={ContractJob} />
                 <Route path='/history' component={History} />
                 <Route path='/professional_profile/contracts' component={ProfessionalProfileContracts} />
-                <Route exact path='/service/:professional_profile_id' component={() => {
-                    return(
-                        <div>
-                            Ver trabalhador
-                        </div>
-                    );
-                }} />
-                <Route exact path='/service/:professional_profile_id/:job_id' component={() => {
-                    return(
-                        <div>
-                            Ver trabalho
-                        </div>
-                    );
-                }} />
+                <Route exact path='/service/:professional_profile_id' component={ProfissionalProfilePage} />
+                <Route exact path='/service/:professional_profile_id/:job_id' component={JobPage} />
             {/* </Switch> */}
         </BrowserRouter>
     );

@@ -1,13 +1,26 @@
 import React from 'react';
 
+import { getConnectedUserId } from '../../../services/auth';
+
 import './job_card.css';
 import Like from '../../../assets/icons/like.svg';
+import Unike from '../../../assets/icons/unlike.svg';
 import Star from '../../../assets/icons/star.svg';
 
 import TempImage from '../../../temp/example_photo.png';
 
 export default function JobCard({ job, history }) {
     const [hover, setHover] = React.useState(false);
+    const [liked, setLiked] = React.useState(false);
+
+    React.useEffect(() => {
+        (async() => {
+            await getConnectedUserId().then(response => {
+                setLiked(job.user_info.likes.includes(response))
+            });
+        })();
+    }, []);
+    
 
     return(
         <div style={styles.cardContainer} onMouseEnter={ e => { setHover(true); }} onMouseLeave={ e => { setHover(false); }}>
@@ -27,7 +40,12 @@ export default function JobCard({ job, history }) {
 
             <div style={hover ? Object.assign({}, styles.cardContent, styles.cardContentBlur) : styles.cardContent}>
                 <div style={styles.likeContainer}>
-                    <img src={Like} alt="like" width="30px"/>
+                    {
+                        liked ?
+                            <img src={Like} alt="like" width="30px"/>
+                        :
+                            <img src={Unike} alt="like" width="30px"/>
+                    }
                     <label style={styles.labelLikes}>+{job.user_info.likes.length}</label>
                 </div>
                 <img style={styles.photo} src={TempImage} alt="profile image" />

@@ -3,6 +3,22 @@ import { LocalStorageToken } from '../localStorage';
 
 var Authenticated = (LocalStorageToken.get(LocalStorageToken.keyItemName.token) === null) ? false : true;
 
+export async function getConnectedUserId() {
+    const token = LocalStorageToken.get(LocalStorageToken.keyItemName.token);
+
+    var _id;
+
+    await api.post('/auth/getConnectedId', {}, {
+        headers: {
+            token
+        }
+    }).then(response => {
+        _id = response.data._id;
+    });
+
+    return _id;
+}
+
 export async function getUser() {
     const token = LocalStorageToken.get(LocalStorageToken.keyItemName.token);
 
