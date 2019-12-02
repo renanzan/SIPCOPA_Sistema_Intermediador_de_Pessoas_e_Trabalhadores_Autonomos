@@ -9,7 +9,7 @@ import Star from '../../../assets/icons/star.svg';
 
 import TempImage from '../../../temp/example_photo.png';
 
-export default function JobCard({ job, history }) {
+export default function JobCard({ job, history, onlyLiked }) {
     const [hover, setHover] = React.useState(false);
     const [liked, setLiked] = React.useState(false);
 
@@ -23,46 +23,52 @@ export default function JobCard({ job, history }) {
     
 
     return(
-        <div style={styles.cardContainer} onMouseEnter={ e => { setHover(true); }} onMouseLeave={ e => { setHover(false); }}>
+        <>
             {
-                hover ?
-                    <div style={styles.cardOverlap}>
-                        <label style={{ fontFamily:'Roboto', color:'white', fontSize:'16px', fontWeight:200, marginBottom:'5px' }}>{job.user_info.fullName}</label>
-                        <label style={{ fontFamily:'Roboto', color:'white', fontSize:'26px', fontVariant:'small-caps', textAlign:'center', marginBottom:'5px' }}>{(job.job)}</label>
-                        <div style={{ fontFamily:'Roboto', color:'white', background:'green', padding:'5px 0', minWidth:'50%', display:'flex', justifyContent:'center', fontSize:'28px', fontWeight:200, marginBottom: '10px' }}>{job.price} bp</div>
-                        <div style={{}}>
-                            <input type='submit' value='Visualizar' onClick={e => { history.push(`/service/${job.user_info.userId}/${job._id}`) }} />
-                            <input type='submit' value='Contratar' onClick={e => { history.push(`/service/${job.user_info.userId}/${job._id}/contract`) }} />
-                        </div>
-                    </div>
-                : null
-            }
+                (onlyLiked && !liked) ? null :
+                    <div style={styles.cardContainer} onMouseEnter={ e => { setHover(true); }} onMouseLeave={ e => { setHover(false); }}>
+                        {
+                            hover ?
+                                <div style={styles.cardOverlap}>
+                                    <label style={{ fontFamily:'Roboto', color:'white', fontSize:'16px', fontWeight:200, marginBottom:'5px' }}>{job.user_info.fullName}</label>
+                                    <label style={{ fontFamily:'Roboto', color:'white', fontSize:'26px', fontVariant:'small-caps', textAlign:'center', marginBottom:'5px' }}>{(job.job)}</label>
+                                    <div style={{ fontFamily:'Roboto', color:'white', background:'green', padding:'5px 0', minWidth:'50%', display:'flex', justifyContent:'center', fontSize:'28px', fontWeight:200, marginBottom: '10px' }}>{job.price} bp</div>
+                                    <div style={{}}>
+                                        <input type='submit' value='Visualizar' onClick={e => { history.push(`/service/${job.user_info.userId}/${job._id}`) }} />
+                                        <input type='submit' value='Contratar' onClick={e => { history.push(`/service/${job.user_info.userId}/${job._id}/contract`) }} />
+                                    </div>
+                                </div>
+                            : null
+                        }
 
-            <div style={hover ? Object.assign({}, styles.cardContent, styles.cardContentBlur) : styles.cardContent}>
-                <div style={styles.likeContainer}>
-                    {
-                        liked ?
-                            <img src={Like} alt="like" width="30px"/>
-                        :
-                            <img src={Unike} alt="like" width="30px"/>
-                    }
-                    <label style={styles.labelLikes}>+{job.user_info.likes.length}</label>
-                </div>
-                <img style={styles.photo} src={TempImage} alt="profile image" />
-                <label style={styles.fullName}>{job.user_info.fullName}</label>
-                <div style={styles.rateContainer}>
-                    <img src={Star} alt="star" width="20px" style={{ marginRight: '5px'}} />
-                    <label>{job.rate_weighted_average.$numberDecimal}</label>
-                </div>
-                <div style={styles.descriptionContainer}>
-                    <label style={{ fontVariant:'small-caps', fontWeight:600, fontSize:'14px' }}>{(job.job)}</label>
-                    <br />
-                    <br />
-                    {job.description}
-                </div>
-                <div style={styles.price}>{job.price} pontos</div>
-            </div>
-        </div>  
+                    <div style={hover ? Object.assign({}, styles.cardContent, styles.cardContentBlur) : styles.cardContent}>
+                        <div style={styles.likeContainer}>
+                            {
+                                liked ?
+                                    <img src={Like} alt="like" width="30px"/>
+                                :
+                                    <img src={Unike} alt="like" width="30px"/>
+                            }
+                            <label style={styles.labelLikes}>+{job.user_info.likes.length}</label>
+                        </div>
+                        <img style={styles.photo} src={TempImage} alt="profile image" />
+                        <label style={styles.fullName}>{job.user_info.fullName}</label>
+                        <div style={styles.rateContainer}>
+                            <img src={Star} alt="star" width="20px" style={{ marginRight: '5px'}} />
+                            <label>{job.rate_weighted_average.$numberDecimal}</label>
+                        </div>
+                        <div style={styles.descriptionContainer}>
+                            <label style={{ fontVariant:'small-caps', fontWeight:600, fontSize:'14px' }}>{(job.job)}</label>
+                            <br />
+                            <br />
+                            {job.description}
+                        </div>
+                        <div style={styles.price}>{job.price} pontos</div>
+                    </div>
+                </div>  
+            }
+        </>
+        
     );
 }
 

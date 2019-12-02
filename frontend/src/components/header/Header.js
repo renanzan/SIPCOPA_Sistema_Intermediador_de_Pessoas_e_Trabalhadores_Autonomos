@@ -177,6 +177,8 @@ const Shrotcut = ({ selected, history, element, index,getNavigationPath }) => {
                         setLoading(false);
                     }
                 });
+
+                setLoading(false);
             })();
         } else
             setLoading(false);

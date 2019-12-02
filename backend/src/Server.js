@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const morgan = require('morgan');
 
 const routes = require('./Routes');
 const database = require('./app/database/Connector');
@@ -12,6 +13,7 @@ database();
 const serverConfig = () => {
     server.use(cors());
     server.use(express.json());
+    server.use(morgan('dev'));
     server.use(routes);
 };
 

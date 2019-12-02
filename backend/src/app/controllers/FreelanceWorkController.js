@@ -52,55 +52,46 @@ module.exports = {
            .sort(sort_by)
            .exec();
 
-        if(jobs.length > 0) {
-            var biggest_price, biggest_rate, smaller_price, smaller_rate;
+        var biggest_price, biggest_rate, smaller_price, smaller_rate;
 
-            Promise.all([
-                await FreelanceWork.findOne(filter, {}, { sort: { 'price' : -1 } }, function(err, job) {
-                    biggest_price = job.price;
-                }),
+        Promise.all([
+            await FreelanceWork.findOne({$or: filter.$and[0].$or}, {}, { sort: { 'price' : -1 } }, function(err, job) {
+                biggest_price = job.price;
+            }),
 
-                await FreelanceWork.findOne(filter, {}, { sort: { 'price' : 1 } }, function(err, job) {
-                    smaller_price = job.price;
-                }),
+            await FreelanceWork.findOne({$or: filter.$and[0].$or}, {}, { sort: { 'price' : 1 } }, function(err, job) {
+                smaller_price = job.price;
+            }),
 
-                await FreelanceWork.findOne(filter, {}, { sort: { 'rate' : -1 } }, function(err, job) {
-                    biggest_rate = job.rate;
-                }),
+            await FreelanceWork.findOne({$or: filter.$and[0].$or}, {}, { sort: { 'rate' : -1 } }, function(err, job) {
+                biggest_rate = job.rate;
+            }),
 
-                await FreelanceWork.findOne(filter, {}, { sort: { 'rate' : 1 } }, function(err, job) {
-                    smaller_rate = job.rate;
-                })
-            ]);
+            await FreelanceWork.findOne({$or: filter.$and[0].$or}, {}, { sort: { 'rate' : 1 } }, function(err, job) {
+                smaller_rate = job.rate;
+            })
+        ]);
 
-            for(var count = 0; count < jobs.length; count++) {
-                const { userId, urlPhoto, likes, fullName } = await ProfessionalProfile.findOne({ _id: jobs[count].professionalProfileId }).select('+userId');
-                jobs[count] = { user_info: { userId, urlPhoto, likes, fullName }, ...jobs[count]._doc };
-                delete jobs[count].__v;
-                delete jobs[count].professionalProfileId;
-            }
+        for(var count = 0; count < jobs.length; count++) {
+            const { userId, urlPhoto, likes, fullName } = await ProfessionalProfile.findOne({ _id: jobs[count].professionalProfileId }).select('+userId');
+            jobs[count] = { user_info: { userId, urlPhoto, likes, fullName }, ...jobs[count]._doc };
+            delete jobs[count].__v;
+            delete jobs[count].professionalProfileId;
+        }
 
-            FreelanceWork.countDocuments(filter).exec(function(err, count) {
-                return res.json({
-                    jobs,
-                    extremes: {
-                        price: [smaller_price, biggest_price],
-                        rate: [smaller_rate, biggest_rate]
-                    },
-                    page: parseInt(page),
-                    perpage: parseInt(perPage),
-                    results: count,
-                    pages: Math.ceil(count / parseInt(perPage))
-                });
-            });
-        } else {
+        FreelanceWork.countDocuments(filter).exec(function(err, count) {
             return res.json({
                 jobs,
+                extremes: {
+                    price: [smaller_price, biggest_price],
+                    rate: [smaller_rate, biggest_rate]
+                },
                 page: parseInt(page),
                 perpage: parseInt(perPage),
-                results: count
+                results: count,
+                pages: Math.ceil(count / parseInt(perPage))
             });
-        }
+        });
     },
 
     async rate(req, res) {

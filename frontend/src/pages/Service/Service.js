@@ -12,6 +12,9 @@ import AnimationData3 from '../../assets/animations/lottie.json/jobs/looking-for
 import LottieControl from '../../assets/animations/LottieControl';
 
 import Slider from '@material-ui/core/Slider';
+import Switch from '@material-ui/core/Switch';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Typography from '@material-ui/core/Typography';
 
 import Footer from '../../components/Footer/Footer';
 
@@ -21,6 +24,11 @@ export default function Service ({ history }) {
     const [search, setSearch] = useState(params.get('query') || '');
     const [page, setPage] = useState(params.get('page') || 1);
     const [lowestPrice, setLowestPrice] = useState(params.get('desc') === null);
+    
+    const [gte, setGte] = useState(0);
+    const [lte, setLte] = useState(1000);
+
+    const [onlyLiked, setOnlyLiked] = useState(false);
 
     const [jobs, setJobs] = useState({});
     const [loading, setLoading] = useState(true);
@@ -31,20 +39,22 @@ export default function Service ({ history }) {
 
         api.post(`/service?page=${page}`, {
             filter: {
-                $or: [{
-                    job: {
-                        $regex: search
-                    }
-                    }, {
-                        description: {
+                $and:[{
+                    $or: [{
+                        job: {
                             $regex: search
                         }
+                        }, {
+                            description: {
+                                $regex: search
+                            }
+                        }
+                    ],
+                    price: {
+                        $gte: gte,
+                        $lte: lte
                     }
-                ],
-                price: {
-                    $gte: 0,
-                    $lte: 1000
-                }
+                }]
             },
             sort_by: {
                 price: lowestPrice ? "asc" : "desc"
@@ -57,7 +67,7 @@ export default function Service ({ history }) {
             setJobs(response.data);
             setLoading(false);
         });
-    }, [page, reload, lowestPrice]);
+    }, [page, reload, lowestPrice, gte, lte]);
 
     function handleChangePage(e) {
         (e === 'NEXT') ? (() => {
@@ -91,9 +101,9 @@ export default function Service ({ history }) {
             {/* <button onClick={ e => handleChangePage('NEXT') }>NEXT</button>
             <button onClick={ e => handleChangePage() }>PREV</button> */}
             
-            <SearchContainer history={history} currentPage={page} search={search} setSearch={setSearch} jobs={jobs} reload={reload} setReload={setReload} />
+            <SearchContainer history={history} currentPage={page} setGte={setGte} setLte={setLte} search={search} setSearch={setSearch} jobs={jobs} reload={reload} setReload={setReload} />
             <div className="list-container">
-                <Filter lowestPrice={lowestPrice} setLowestPrice={setLowestPrice} />
+                <Filter loading={loading} jobs={jobs} setGte={setGte} setLte={setLte} onlyLiked={onlyLiked} setOnlyLiked={setOnlyLiked} lowestPrice={lowestPrice} setLowestPrice={setLowestPrice} />
                 {
                     loading ? (() => {
                         if((Math.floor(Math.random()*3) + 1) === 1)
@@ -103,7 +113,7 @@ export default function Service ({ history }) {
                         else
                             return(<LottieControl animationData={AnimationData3} height="400" style={styles.loadingContainer} />);
                         })() :
-                    <List jobs={jobs} history={history} />
+                    <List onlyLiked={onlyLiked} jobs={jobs} history={history} />
                 }
             </div>
             {/* <Footer /> */}
@@ -111,21 +121,37 @@ export default function Service ({ history }) {
     );
 }
 
-const SearchContainer = ({ history, search, setSearch, jobs, reload, setReload }) => {
+const SearchContainer = ({ history, search, setSearch, jobs, setGte, setLte, reload, setReload }) => {
     return(
         <div className='search-container'>
-            <InputText value='Buscar' placeholder='Filtrar resultados' useState={search} setState={setSearch} style={{ width:'30%' }} onPressEnter={() => { history.push(`/service?query=${search}&page=${Number.parseInt(1)}`); setReload(!reload); }} />
+            <InputText value='Buscar' placeholder='Filtrar resultados' useState={search} setState={setSearch} style={{ width:'30%' }} onPressEnter={() => { setGte(0); setLte(1000); history.push(`/service?query=${search}&page=${Number.parseInt(1)}`); setReload(!reload); }} />
             <label className="results">{jobs.results} trabalhos encontrados</label>
         </div>
     );
 }
 
-const Filter = ({ lowestPrice, setLowestPrice }) => {
-    const [value, setValue] = React.useState([0, 37]);
+const Filter = ({ loading, jobs, setGte, setLte, onlyLiked, setOnlyLiked, lowestPrice, setLowestPrice }) => {
+    var maxPrice, minPrice;
+    const [value, setValue] = React.useState([]);
+
+    if(jobs.extremes) {
+        minPrice = jobs.extremes.price[0];
+        maxPrice = jobs.extremes.price[1];
+    }
+
+    useEffect(() => {
+        const newValue = [minPrice, maxPrice];
+        setValue(newValue);
+    }, [minPrice, maxPrice]);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
+
+    const handleSearch = (event) => {
+        setGte(value[0]);
+        setLte(value[1]);
+    }
 
     function valuetext(value) {
         return `${value} points`;
@@ -133,44 +159,71 @@ const Filter = ({ lowestPrice, setLowestPrice }) => {
 
     const marks = [
         {
-          value: 0,
-          label: '0 Ɏ',
+          value: minPrice,
+          label: `${minPrice} Ɏ`,
         },
         {
-          value: 25,
-          label: '25 Ɏ',
-        },
+            value: ((minPrice + maxPrice) /2),
+            label: `${((minPrice + maxPrice) /2)} Ɏ`,
+          },
         {
-          value: 50,
-          label: '50 Ɏ',
+          value: maxPrice,
+          label: `${maxPrice} Ɏ`,
         }
-      ];
+    ];
 
     return(
         <div className="left-container">
             <OrderBy style={{ marginBottom: '25px' }} lowestPrice={lowestPrice} setLowestPrice={setLowestPrice} />
+            
             <div className="filter-container">
                 <div className="filter-content">
                     <label className="title">Filtros</label>
 
-                    <label>Intervalo de preço</label>
-                    {/* <Slider
-                        orientation="vertical"
-                        value={value}
-                        onChange={handleChange}
-                        valueLabelDisplay="auto"
-                        aria-labelledby="range-slider"
-                        aria-labelledby="vertical-slider"
-                        getAriaValueText={valuetext}
-                        max="50"
-                        marks={marks} /> */}
+                    <FormControlLabel
+                        control={
+                            <Switch checked={onlyLiked} onChange={e => {setOnlyLiked(!onlyLiked)}} value="jason" />
+                        }
+                        label="Apenas Favoritos" />
+
+                    <div style={{ marginTop:'20px', height:'200px', width:'200px' }}>
+                        <Typography id="discrete-slider" gutterBottom>Intervalo de preço</Typography>
+                        {
+                            (loading) ?
+                                (!maxPrice || !minPrice) ? null :
+                                    <Slider
+                                        // orientation="vertical"
+                                        value={value}
+                                        valueLabelDisplay="auto"
+                                        aria-labelledby="range-slider"
+                                        aria-labelledby="vertical-slider"
+                                        getAriaValueText={valuetext}
+                                        min={minPrice || 0}
+                                        max={maxPrice || 50}
+                                        marks={marks}
+                                        disabled />
+                            :
+                                <Slider
+                                    // orientation="vertical"
+                                    value={value}
+                                    onChange={handleChange}
+                                    onMouseUp={handleSearch}
+                                    valueLabelDisplay="auto"
+                                    aria-labelledby="range-slider"
+                                    aria-labelledby="vertical-slider"
+                                    getAriaValueText={valuetext}
+                                    min={minPrice || 0}
+                                    max={maxPrice || 50}
+                                    marks={marks} />
+                        }
+                    </div>
                 </div>
             </div>
         </div>
     );
 }
 
-const List = ({ history, jobs }) => {
+const List = ({ history, jobs, onlyLiked }) => {
     return(
         <div style={styles.list}>
             {
@@ -178,7 +231,7 @@ const List = ({ history, jobs }) => {
                     jobs.jobs ? 
                         jobs.jobs.map((element, index) => {
                             return(
-                                <JobCard key={index} job={element} history={history} />
+                                <JobCard key={index} job={element} history={history} onlyLiked={onlyLiked} />
                             );
                         })
                     : null
