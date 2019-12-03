@@ -3,14 +3,16 @@ import React from 'react';
 import { getConnectedUserId } from '../../../services/auth';
 
 import './job_card.css';
-import Like from '../../../assets/icons/like.svg';
-import Unike from '../../../assets/icons/unlike.svg';
-import Star from '../../../assets/icons/star.svg';
+import ProfileButton from '../../../assets/icons/job card/profile-button.svg';
+import JobButton from '../../../assets/icons/job card/job-button.svg';
+import ContractButton from '../../../assets/icons/job card/contract-button.svg';
 
 import PhotoProfileLoading from '../../../assets/animations/lottie.json/photo-profile-loading.json';
+import LikeAnimation from '../../../assets/animations/lottie.json/like.json';
+import UnlikeAnimation from '../../../assets/animations/lottie.json/unlike.json';
+import Star from '../../../assets/animations/lottie.json/star.json';
 import LottieControl from '../../../assets/animations/LottieControl';
 
-import TempImage from '../../../temp/example_photo.png';
 import api from '../../../services/api';
 
 export default function JobCard({ job, history, onlyLiked }) {
@@ -55,9 +57,10 @@ export default function JobCard({ job, history, onlyLiked }) {
                                     <label style={{ fontFamily:'Roboto', color:'white', fontSize:'16px', fontWeight:200, marginBottom:'5px' }}>{job.user_info.fullName}</label>
                                     <label style={{ fontFamily:'Roboto', color:'white', fontSize:'26px', fontVariant:'small-caps', textAlign:'center', marginBottom:'5px' }}>{(job.job)}</label>
                                     <div style={{ fontFamily:'Roboto', color:'white', background:'green', padding:'5px 0', minWidth:'50%', display:'flex', justifyContent:'center', fontSize:'28px', fontWeight:200, marginBottom: '10px' }}>{job.price} bp</div>
-                                    <div style={{}}>
-                                        <input type='submit' value='Visualizar' onClick={e => { history.push(`/service/${job.user_info.userId}/${job._id}`) }} />
-                                        <input type='submit' value='Contratar' onClick={e => { history.push(`/service/${job.user_info.userId}/${job._id}/contract`) }} />
+                                    <div style={{ marginTop:'10px' }}>
+                                        <img src={ProfileButton} style={{ marginRight:'10px', cursor:'pointer' }} onClick={e => { history.push(`/service/${job.user_info.userId}`) }} />
+                                        <img src={JobButton} style={{ marginRight:'10px', cursor:'pointer' }} onClick={e => { history.push(`/service/${job.user_info.userId}/${job._id}`) }} />
+                                        <img src={ContractButton} style={{ cursor:'pointer' }} onClick={e => { history.push(`/service/${job.user_info.userId}/${job._id}/contract`) }} />
                                     </div>
                                 </div>
                             : null
@@ -66,10 +69,12 @@ export default function JobCard({ job, history, onlyLiked }) {
                     <div style={hover ? Object.assign({}, styles.cardContent, styles.cardContentBlur) : styles.cardContent}>
                         <div style={styles.likeContainer}>
                             {
-                                liked ?
-                                    <img src={Like} alt="like" width="30px"/>
-                                :
-                                    <img src={Unike} alt="like" width="30px"/>
+                                !liked ? null :
+                                <LottieControl animationData={LikeAnimation} height="30px" width="30px" loop={false} />
+                            }
+                            {
+                                liked ? null :
+                                <LottieControl animationData={UnlikeAnimation} height="30px" width="30px" loop={false} />
                             }
                             <label style={styles.labelLikes}>+{job.user_info.likes.length}</label>
                         </div>
@@ -79,14 +84,12 @@ export default function JobCard({ job, history, onlyLiked }) {
                         }
                         <label style={styles.fullName}>{job.user_info.fullName}</label>
                         <div style={styles.rateContainer}>
-                            <img src={Star} alt="star" width="20px" style={{ marginRight: '5px'}} />
-                            <label>{job.rate_weighted_average.$numberDecimal}</label>
+                            <LottieControl animationData={Star} height="55px" width="30px" loop={false} />
+                            <label>{parseFloat(job.rate_weighted_average.$numberDecimal).toFixed(1)}</label>
                         </div>
                         <div style={styles.descriptionContainer}>
-                            <label style={{ fontVariant:'small-caps', fontWeight:600, fontSize:'14px' }}>{(job.job)}</label>
-                            <br />
-                            <br />
-                            {job.description}
+                            <div style={{ fontVariant:'small-caps', fontWeight:600, fontSize:'14px' }}>{(job.job)}</div>
+                            <div style={{ marginTop:'5px' }}>{job.description}</div>
                         </div>
                         <div style={styles.price}>{job.price} pontos</div>
                     </div>
@@ -156,17 +159,18 @@ const styles = {
     },
     fullName: {
         fontWeight: 600,
-        margin: '10px 0 5px 0'
+        margin: '15px 0 5px 0'
     },
     rateContainer: {
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
-        margin: '0 0 10px 0'
+        margin: '0 0 20px 0'
     },
     descriptionContainer: {
         flex: 1,
         padding: '0 20px',
+        marginBottom:'20px',
         color: 'rgba(0, 0, 0, 0.6)',
         fontWeight: 400,
         fontSize: '12px',
@@ -175,6 +179,8 @@ const styles = {
     price: {
         fontWeight: 800,
         alignSelf: 'flex-end',
-        padding: '5px'
+        padding: '5px',
+        marginRight:'10px',
+        marginBottom:'5px'
     }
 }

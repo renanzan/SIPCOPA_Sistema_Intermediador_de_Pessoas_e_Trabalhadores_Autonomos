@@ -1,44 +1,39 @@
 import React from 'react'
 import Lottie from 'react-lottie';
 
-var defaultAnimationData;
-var height, width;
 
-export default class LottieControl extends React.Component {
 
-    constructor(props) {
-        defaultAnimationData = props.animationData;
-        height = props.height;
-        width = props.width;
+export default function LottieControl({ animationData:_animationData, height:_height, width:_width, loop:_loop, style }) {
+    const [animationData, setAnimationData] = React.useState(_animationData);
+    const [height, setHeight] = React.useState(_height);
+    const [width, setWidth] = React.useState(_width);
 
-        super(props);
-        this.state = {isStopped: false, isPaused: false};
-    }
+    const [isStopped, setStoped] = React.useState(false);
+    const [isPaused, setPaused] = React.useState(false);
 
-    render() {
-        // const buttonStyle = {
-        //     display: 'block',
-        //     margin: '10px auto'
-        // };
+    // const buttonStyle = {
+    //     display: 'block',
+    //     margin: '10px auto'
+    // };
 
-        const defaultOptions = {
-            loop: true,
-            autoplay: true, 
-            animationData: defaultAnimationData,
-            rendererSettings: {
+    const defaultOptions = {
+        loop: _loop===undefined ? true : _loop,
+        autoplay: true, 
+        animationData: animationData,
+        rendererSettings: {
             preserveAspectRatio: 'xMidYMid slice'
         }
-    };
+    }
 
     return(
-        <div style={this.props.style}>
+        <div style={style}>
             <Lottie
                 options={defaultOptions}
                 height={parseInt(height) || 400}
                 width={parseInt(width) || 400}
-                isStopped={this.state.isStopped}
-                isPaused={this.state.isPaused}/>
+                
+                isStopped={isStopped}
+                isPaused={isPaused}/>
         </div>
     );
-  }
 }

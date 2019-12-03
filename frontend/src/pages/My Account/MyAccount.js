@@ -243,7 +243,7 @@ const DontHaveProfessionalProfile = ({ title, createAccount, fieldValues, positi
     return(
         <div style={{ display:'flex', alignItems:'center', justifyContent:'center', flex: 1}}>
             {
-                !createProfissionalProfile ?
+                createProfissionalProfile ?
                     <CreateProfissionalProfile title={title} fieldValues={fieldValues} positiveButtonValue={positiveButtonValue} positiveButtonOnClick={positiveButtonOnClick} negativeButton={negativeButton} negativeButtonValue={negativeButtonValue} negativeButtonOnClick={negativeButtonOnClick} /> :
                 <div style={{ textAlign:'center', fontSize:'12px', padding:'200px' }} className="card">
                     <img src={Desert} alt="desert" />

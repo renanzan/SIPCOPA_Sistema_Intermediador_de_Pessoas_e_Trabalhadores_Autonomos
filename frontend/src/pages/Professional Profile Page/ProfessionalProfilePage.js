@@ -4,6 +4,9 @@ import api from '../../services/api';
 
 import '../../pages/Professional Profile Page/ProfessionalProfilePage.css';
 
+import LottieControl from '../../assets/animations/LottieControl';
+import PhotoProfileLoading from '../../assets/animations/lottie.json/photo-profile-loading.json';
+
 import Star from '../../assets/icons/star.svg';
 import Coin from '../../assets/icons/coin.svg';
 import TempImage from '../../temp/example_photo.png';
@@ -16,11 +19,15 @@ export default function ProfessionalProfilePage({ history, match }) {
     const[jobs, setJobs] = React.useState();
     const[user, setUser] = React.useState();
 
+    const [imageLoading, setImageLoading] = React.useState(true);
+    const [image, setImage] = React.useState();
+
     React.useEffect(() => {
         (async() => {
             setLoading(true);
+            setImageLoading(true);
 
-            await api.post('/professional_profile/getByUser', {}, {
+            const image_id = await api.post('/professional_profile/getByUser', {}, {
                 headers: {
                     professional_profile_id: professionalProfileId
                 }
@@ -30,8 +37,23 @@ export default function ProfessionalProfilePage({ history, match }) {
                 setUser(response.data.user);
                 setJobs(response.data.jobs);
                 setLoading(false);
+                return response.data.professionalProfile.imageId;
             }).catch(error => {
                 console.log(error);
+            });
+
+            await api.post('/get/image', {}, {
+                headers: {
+                    image_id
+                }
+            }).then(response => {
+                const buff = new Buffer(response.data.img.data);
+
+                setImage({
+                    buff,
+                    type: response.data.type
+                });
+                setImageLoading(false);
             });
         })();
     }, []);
@@ -40,13 +62,13 @@ export default function ProfessionalProfilePage({ history, match }) {
         <div className='main-container'>
             {
                 loading ? 'Loading...' :
-                <ProfessionalProfileInfo history={history} user={user} professionalProfile={professionalProfile} jobs={jobs} />
+                <ProfessionalProfileInfo imageLoading={imageLoading} image={image} history={history} user={user} professionalProfile={professionalProfile} jobs={jobs} />
             }
         </div>
     );
 }
 
-const ProfessionalProfileInfo = ({ user, professionalProfile, jobs }) => {
+const ProfessionalProfileInfo = ({ imageLoading, image, user, professionalProfile, jobs }) => {
 
     const [currentJob, setCurrentJob] = useState(0);
 
@@ -54,7 +76,7 @@ const ProfessionalProfileInfo = ({ user, professionalProfile, jobs }) => {
         <div className="accountInfoContainer">
             <div>
                 <div className="cardAccountInfo">
-                    <UserInfo currentJob={currentJob} setCurrentJob={setCurrentJob} user={user} professionalProfile={professionalProfile} jobs={jobs} />
+                    <UserInfo imageLoading={imageLoading} image={image} currentJob={currentJob} setCurrentJob={setCurrentJob} user={user} professionalProfile={professionalProfile} jobs={jobs} />
                     <div style={{ fontVariant:'small-caps', letterSpacing:'2px', margin:'50px 0 20px 0' }}>Informações de contato</div>
                     <div>
                         <div style={styles.label}>Celular</div>
@@ -98,7 +120,7 @@ const ProfessionalProfileInfo = ({ user, professionalProfile, jobs }) => {
     );
 }
 
-const UserInfo = ({ currentJob, setCurrentJob, user, professionalProfile, jobs }) => {
+const UserInfo = ({ imageLoading, image, currentJob, setCurrentJob, user, professionalProfile, jobs }) => {
     const [likesCount, setLikesCount] = React.useState(professionalProfile.likes.length);
 
     function handleLike() {
@@ -117,7 +139,10 @@ const UserInfo = ({ currentJob, setCurrentJob, user, professionalProfile, jobs }
 
     return(
         <div style={styles.userInfoContainer}>
-            <img src={TempImage} style={styles.profilePhoto} className="unselectable"/>
+            {
+                imageLoading ? <LottieControl style={{ marginTop:'30px' }} animationData={PhotoProfileLoading} height="128px" width="128px" /> :
+                <img style={styles.profilePhoto} src={image.type + ',' + image.buff} alt='profile image' width='150px' height='150px' />
+            }
             <div style={styles.infoContainer} >
                 <div style={styles.likesContainer} className="unselectable">
                     <input type='submit' value='like' onClick={handleLike}/>
