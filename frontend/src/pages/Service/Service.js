@@ -184,7 +184,7 @@ const Filter = ({ loading, jobs, setGte, setLte, onlyLiked, setOnlyLiked, lowest
                         control={
                             <Switch checked={onlyLiked} onChange={e => {setOnlyLiked(!onlyLiked)}} value="jason" />
                         }
-                        label="Apenas Favoritos" />
+                        label="Apenas favoritos" />
 
                     <div style={{ marginTop:'20px', height:'200px', width:'200px' }}>
                         <Typography id="discrete-slider" gutterBottom>Intervalo de preço</Typography>

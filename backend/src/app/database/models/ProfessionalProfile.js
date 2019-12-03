@@ -38,6 +38,10 @@ const ProfissionalProfileSchema = new Schema({
         index: true,
         ref: 'User'
     },
+    imageId: {
+        type: Schema.Types.ObjectId,
+        required: true
+    },
     likes: [{
         type: Schema.Types.ObjectId
     }],

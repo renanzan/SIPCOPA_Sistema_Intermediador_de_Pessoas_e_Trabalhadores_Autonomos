@@ -54,6 +54,19 @@ module.exports = {
 
         var biggest_price, biggest_rate, smaller_price, smaller_rate;
 
+        if(jobs.length <= 0)
+            return res.json({
+                jobs,
+                price_by_rate: {
+                    rate_range: 0,
+                    smaller_price: 0,
+                    biggest_price: 0,
+                    partial_average: 0,
+                    occurrences: 0,
+                    average: 0
+                }
+            });
+
         Promise.all([
             await FreelanceWork.findOne({$or: filter.$and[0].$or}, {}, { sort: { 'price' : -1 } }, function(err, job) {
                 biggest_price = job.price;
@@ -73,10 +86,9 @@ module.exports = {
         ]);
 
         for(var count = 0; count < jobs.length; count++) {
-            const { userId, urlPhoto, likes, fullName } = await ProfessionalProfile.findOne({ _id: jobs[count].professionalProfileId }).select('+userId');
-            jobs[count] = { user_info: { userId, urlPhoto, likes, fullName }, ...jobs[count]._doc };
+            const { userId, imageId, likes, fullName } = await ProfessionalProfile.findOne({ _id: jobs[count].professionalProfileId }).select('+userId');
+            jobs[count] = { user_info: { userId, imageId, likes, fullName }, ...jobs[count]._doc };
             delete jobs[count].__v;
-            delete jobs[count].professionalProfileId;
         }
 
         FreelanceWork.countDocuments(filter).exec(function(err, count) {

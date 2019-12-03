@@ -5,13 +5,13 @@ import './my_account.css';
 import api from '../../services/api';
 
 import Loading from '../../assets/animations/lottie.json/skeleton-loading.json';
+import PhotoProfileLoading from '../../assets/animations/lottie.json/photo-profile-loading.json';
 import LottieControl from '../../assets/animations/LottieControl';
 import { InputText } from '../../components/custom/Input';
 
 import Star from '../../assets/icons/star.svg';
 import Coin from '../../assets/icons/coin.svg';
 import Desert from '../../assets/images/desert.svg';
-import TempImage from '../../temp/example_photo.png';
 
 export default function MyAccount({ history }) {
     const [loading, setLoading] = useState(true);
@@ -184,9 +184,35 @@ const ProfessionalProfileInfo = ({ history, currentJob, setCurrentJob, user, pro
 }
 
 const UserInfo = ({ currentJob, setCurrentJob, professionalProfile }) => {
+    const[loading, setLoading] = useState(true);
+    const[image, setImage] = useState();
+
+    useEffect(() => {
+        setLoading(true);
+
+        (async() => {
+            api.post('/get/image', {}, {
+                headers: {
+                    image_id: professionalProfile.professionalProfile.imageId
+                }
+            }).then(response => {
+                const buff = new Buffer(response.data.img.data);
+
+                setImage({
+                    buff,
+                    type: response.data.type
+                });
+                setLoading(false);
+            });
+        })();
+    }, []);
+
     return(
         <div style={styles.userInfoContainer}>
-            <img src={TempImage} style={styles.profilePhoto} className="unselectable"/>
+            {
+                loading ? <LottieControl animationData={PhotoProfileLoading} height="128px" width="128px" /> :
+                <img src={image.type + ',' + image.buff} style={styles.profilePhoto} width='128px' height='128px' className="unselectable"/>
+            }
             <div style={styles.infoContainer} >
                 <div style={styles.likesContainer} className="unselectable">+{professionalProfile.professionalProfile.likes.length} likes</div>
                 <div style={styles.profileFullName}>{professionalProfile.professionalProfile.fullName}</div>
@@ -217,7 +243,7 @@ const DontHaveProfessionalProfile = ({ title, createAccount, fieldValues, positi
     return(
         <div style={{ display:'flex', alignItems:'center', justifyContent:'center', flex: 1}}>
             {
-                createProfissionalProfile ?
+                !createProfissionalProfile ?
                     <CreateProfissionalProfile title={title} fieldValues={fieldValues} positiveButtonValue={positiveButtonValue} positiveButtonOnClick={positiveButtonOnClick} negativeButton={negativeButton} negativeButtonValue={negativeButtonValue} negativeButtonOnClick={negativeButtonOnClick} /> :
                 <div style={{ textAlign:'center', fontSize:'12px', padding:'200px' }} className="card">
                     <img src={Desert} alt="desert" />
@@ -231,6 +257,8 @@ const DontHaveProfessionalProfile = ({ title, createAccount, fieldValues, positi
 }
 
 const CreateProfissionalProfile = ({ title, fieldValues, positiveButtonValue, positiveButtonOnClick, negativeButton, negativeButtonValue, negativeButtonOnClick }) => {
+    const [image, setImage] = useState();
+    const [file, setFile] = useState({});
     const[name, setName] = useState('Renan Henrique Zanoti');
     const[biography, setBiography] = useState('Eu sei programar.');
     const[phoneNumber, setPhoneNumber] = useState('999999999');
@@ -241,7 +269,20 @@ const CreateProfissionalProfile = ({ title, fieldValues, positiveButtonValue, po
     const[number, setNumber] = useState('3733');
 
     async function handleCreateProfissionalProfile() {
+
+        console.log(image[1]);
+        
+        const imageId = await api.post('/upload/image', {
+            file: image[1],
+            type: image[0],
+            name: file.name,
+            size: file.size
+        }).then(response => {
+            return (response.data._id);
+        });
+
         const response = await api.post('/professional_profile/new', {
+            imageId,
             url_photo: null,
             full_name: name,
             biography,
@@ -267,16 +308,62 @@ const CreateProfissionalProfile = ({ title, fieldValues, positiveButtonValue, po
         }
     }
 
+    function buildFileSelector(){
+        const fileSelector = document.createElement('input');
+        fileSelector.setAttribute('type', 'file');
+        fileSelector.setAttribute('accept', 'image/png, image/jpeg, image/gif');
+
+        fileSelector.addEventListener('change', readURL);
+
+        return fileSelector;
+    }
+
+    function readURL() {
+        var fileSelected = fileSelector.files[0];
+
+        if(fileSelected.size <= 2 * 1024 * 1024) {
+            var reader = new FileReader();
+
+            if(fileSelected)
+                reader.readAsDataURL(fileSelected);
+
+            reader.onloadend = function() {
+                const buff = reader.result.split(',');
+
+                setImage(buff);
+                setFile({
+                    name: fileSelected.name,
+                    size: fileSelected.size
+                });
+            }
+        } else {
+            console.log('Imagem muito grande.');
+        }
+    }
+
+    const fileSelector = buildFileSelector();
+
+    function handleFileSelect(e) {
+        e.preventDefault();
+        fileSelector.click();
+    }
+
     return(
         <div style={{ fontSize:'12px', minWidth:'800px', minHeight:'400px', padding:'20px 50px 20px 50px' }} className="card">
             <div style={{ alignSelf:'center', margin:'10px 0 30px 0', fontVariant:'small-caps', fontSize:'16px', fontWeight: 300, letterSpacing:'2px' }}>{title || 'Cadastrar perfil profissional'}</div>
             <div style={{ display:'flex', flexDirection:'row' }} >
                 <div style={{ display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center', flex:1 }}>
-                    {/* <input placeholder='foto' /> */}
+                    <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', width:'130px', height:'130px', background:'#F3F3F3', border:'1px dashed #666', cursor:'pointer' }} onClick={handleFileSelect}>
+                        {
+                            !image ? 'Carregar foto de perfil' :
+                            <img src={image[0] + ',' +  image[1]} alt='teste' width='128px' height='128px' />
+                        }
+                    </div>
+                    <label style={{ color:'rgba(0, 0, 0, 0.4)', marginTop:'5px', marginBottom:'20px' }}>Tamanho ideal: 128x128</label>
+                    
                     <InputText value='Nome completo' placeholder='Digite seu nome completo' useState={fieldValues ? fieldValues.name : name} setState={fieldValues ? fieldValues.setName : setName} style={{ alignSelf: 'stretch' }} />
                     <InputText type="textarea" value='Biografia' placeholder='Escreva um pouco sobre você' useState={fieldValues ? fieldValues.biography : biography} setState={fieldValues ? fieldValues.setBiography : setBiography} style={{ alignSelf: 'stretch', marginTop: 20 }} />
                     <InputText value='Número de celular' placeholder='Digite o número do seu celular' useState={fieldValues ? fieldValues.phoneNumber : phoneNumber} setState={fieldValues ? fieldValues.setPhoneNumber : setPhoneNumber} style={{ alignSelf: 'stretch', marginTop: 20 }} />
-                    {/* <input placeholder='data de nascimento' /> */}
                 </div>
                 <div style={{ display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center', flex:1, margin:'0 0 0 50px' }}>
                     <InputText value='Estado' placeholder='Digite seu estado' useState={fieldValues ? fieldValues.state : state} setState={fieldValues ? fieldValues.setState : setState} style={{ alignSelf: 'stretch' }} />

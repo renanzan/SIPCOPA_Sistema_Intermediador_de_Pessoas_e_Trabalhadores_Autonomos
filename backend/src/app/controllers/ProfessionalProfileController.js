@@ -56,7 +56,7 @@ const myProfessionalProfile = async (req, res) => {
 const store = async (req, res) => {
     const { authentication } = req.headers;
     const { id:userId } = await Authenticator.decode(authentication);
-    const { url_photo, full_name, biography, date_of_birth, phone_number, email, state, city, district, street, number } = req.body;
+    const { imageId, full_name, biography, date_of_birth, phone_number, email, state, city, district, street, number } = req.body;
 
     await checkIfHaveProfessionalProfile(authentication).then((obj) => {
         return res.json(obj);
@@ -69,7 +69,7 @@ const store = async (req, res) => {
 
             const profissionalProfile = await ProfessionalProfile.create({
                 userId,
-                urlPhoto: url_photo,
+                imageId,
                 fullName: full_name,
                 biography,
                 dateOfBirth: date_of_birth,

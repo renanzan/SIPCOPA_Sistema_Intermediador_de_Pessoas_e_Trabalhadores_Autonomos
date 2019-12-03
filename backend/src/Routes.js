@@ -1,4 +1,6 @@
 const express = require('express');
+const multer = require('multer');
+const multerConfig = require('./config/multer');
 
 const AuthController = require('./app/controllers/AuthController');
 const UserController = require('./app/controllers/UserController');
@@ -6,6 +8,7 @@ const ProfessionalProfileController = require('./app/controllers/ProfessionalPro
 const FreelanceWorkController = require('./app/controllers/FreelanceWorkController');
 const HireController = require('./app/controllers/HireController');
 const ContractController = require('./app/controllers/ContractController');
+const UserImageController = require('./app/controllers/UserImageController');
 
 const routes = express.Router();
 
@@ -51,5 +54,8 @@ routes.post('/contracts/getByJobId', ContractController.getContractsByJobId);
 routes.post('/contract/rate', ContractController.rate);
 
 routes.post('/bitpoint_recharge', UserController.bitpointRechargestore);
+
+routes.post('/upload/image', UserImageController.uploadImage);
+routes.post('/get/image', UserImageController.getImage);
 
 module.exports = routes;

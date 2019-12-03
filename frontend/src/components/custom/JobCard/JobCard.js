@@ -7,16 +7,38 @@ import Like from '../../../assets/icons/like.svg';
 import Unike from '../../../assets/icons/unlike.svg';
 import Star from '../../../assets/icons/star.svg';
 
+import PhotoProfileLoading from '../../../assets/animations/lottie.json/photo-profile-loading.json';
+import LottieControl from '../../../assets/animations/LottieControl';
+
 import TempImage from '../../../temp/example_photo.png';
+import api from '../../../services/api';
 
 export default function JobCard({ job, history, onlyLiked }) {
     const [hover, setHover] = React.useState(false);
     const [liked, setLiked] = React.useState(false);
 
+    const [imageLoding, setImageLoading] = React.useState(true);
+    const [image, setImage] = React.useState();
+
     React.useEffect(() => {
         (async() => {
             await getConnectedUserId().then(response => {
                 setLiked(job.user_info.likes.includes(response))
+            });
+
+            setImageLoading(true);
+            await api.post('/get/image', {}, {
+                headers: {
+                    image_id: job.user_info.imageId
+                }
+            }).then(response => {
+                const buff = new Buffer(response.data.img.data);
+
+                setImage({
+                    buff,
+                    type: response.data.type
+                });
+                setImageLoading(false);
             });
         })();
     }, []);
@@ -51,7 +73,10 @@ export default function JobCard({ job, history, onlyLiked }) {
                             }
                             <label style={styles.labelLikes}>+{job.user_info.likes.length}</label>
                         </div>
-                        <img style={styles.photo} src={TempImage} alt="profile image" />
+                        {
+                            imageLoding ? <LottieControl style={{ marginTop:'30px' }} animationData={PhotoProfileLoading} height="128px" width="128px" /> :
+                            <img style={styles.photo} src={image.type + ',' + image.buff} alt='profile image' width='128px' height='128px' />
+                        }
                         <label style={styles.fullName}>{job.user_info.fullName}</label>
                         <div style={styles.rateContainer}>
                             <img src={Star} alt="star" width="20px" style={{ marginRight: '5px'}} />
@@ -120,14 +145,14 @@ const styles = {
         fontSize: '14px'
     },
     photo: {
-        height: 150,
-        width: 150,
+        height: 128,
+        width: 128,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         border: 'solid 1px rgba(0, 0, 0, 0.15)',
         borderRadius: '50%',
-        marginTop: '15px'
+        marginTop: '30px'
     },
     fullName: {
         fontWeight: 600,
