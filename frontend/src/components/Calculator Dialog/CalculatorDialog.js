@@ -42,8 +42,6 @@ export default function CalculatorDialog({ job, setPrice }) {
             (async () => {
                 setLoading(true);
 
-                console.log('TESTE');
-
                 await api.post('/job/suggest_price', { job }).then(response => {
                     if(response.data) {
                         const { data } = response;
@@ -62,8 +60,6 @@ export default function CalculatorDialog({ job, setPrice }) {
                                 )
                             );
                         }
-
-                        console.log(response.data);
 
                         setRows(tempRows);
                         setLoading(false);

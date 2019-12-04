@@ -108,6 +108,7 @@ const styles = {
         alignItems: 'center',
         background: 'white',
         width: '250px',
+        height: '370px',
         margin: '10px',
         boxShadow: '0 0 5px rgba(0, 0, 0, 0.25)',
         borderRadius: '4px'

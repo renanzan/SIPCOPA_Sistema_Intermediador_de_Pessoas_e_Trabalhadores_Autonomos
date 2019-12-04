@@ -10,6 +10,14 @@ const getUser = async (authentication) => {
     return await User.findOne({ _id: decoded.id });
 }
 
+const getUserByAuthentication = async(req, res) => {
+    const { authentication } = req.headers;
+
+    const user = await getUser(authentication);
+
+    return res.json(user);
+}
+
 const getUserById = async(req, res) => {
     const { user_id } = req.headers;
     
@@ -34,6 +42,7 @@ const bitpointRechargestore = async (req, res) => {
 
 module.exports = {
     getUser,
+    getUserByAuthentication,
     getUserById,
     bitpointRechargestore
 }

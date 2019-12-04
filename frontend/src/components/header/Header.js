@@ -90,13 +90,13 @@ const MenuConnected = ({ pathname, history }) => {
         <ul>
             {
                 pathname.toUpperCase().startsWith('/SERVICE') ?
-                    <li className="selected">Serviço</li> :
+                    <li className="selected" onClick={ () => {history.push('/service')} }>Serviço</li> :
                     <li onClick={ () => {history.push('/service')} }>Serviço</li>
             }
             {
                 pathname.toUpperCase() === '/MY_ACCOUNT' ?
-                    <li className="selected">Minha conta</li> :
-                    <li onClick={ () => { history.push('/my_account')} }>Minha conta</li>
+                    <li className="selected">Meu perfil profissional</li> :
+                    <li onClick={ () => { history.push('/my_account')} }>Meu perfil profissional</li>
             }
             {
                 pathname.toUpperCase() === '/HISTORY' ?
@@ -149,7 +149,7 @@ const TopNavigation = ({ pathname, history }) => {
     );
 }
 
-const Shrotcut = ({ selected, history, element, index,getNavigationPath }) => {
+const Shrotcut = ({ selected, history, element, index, getNavigationPath }) => {
     const [loading, setLoading] = React.useState(true);
     const [shortcut, setShortcut] = React.useState(element);
 
@@ -189,9 +189,9 @@ const Shrotcut = ({ selected, history, element, index,getNavigationPath }) => {
         {
             loading ? 'loading' :
                 selected ?
-                    <label style={{ color:'#2AABCC' }} className="selectable" onClick={() => {  }} >{shortcut}</label>
+                    <label style={{ color:'#2AABCC', cursor:'default' }} className="shortcut" >{shortcut}</label>
                 :
-                    <label className="selectable" onClick={() => { history.push(getNavigationPath(index)) }}>{shortcut}</label>
+                    <label className="shortcut" onClick={() => { history.push(getNavigationPath(index)) }}>{shortcut}</label>
         }
         </>
     );

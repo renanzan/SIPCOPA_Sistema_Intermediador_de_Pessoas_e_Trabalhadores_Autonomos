@@ -14,6 +14,7 @@ import History from './pages/History/History';
 import ProfessionalProfileContracts from './pages/Professional Profile Contracts/ProfessionalProfileContracts';
 import ProfissionalProfilePage from './pages/Professional Profile Page/ProfessionalProfilePage';
 import JobPage from './pages/Job Page/JobPage';
+import EditJobPage from './pages/Edit Job Page/EditJobPage';
 
 export default function Routes() {
     return (
@@ -23,13 +24,14 @@ export default function Routes() {
                 <Route exact path='/' component={Presentation} />
                 <Route exact path='/connect' component={Connect} />
                 <Route exact path='/service' component={Service} />
-                <Route path='/my_account' component={MyAccount} />
+                <Route exact path='/my_account' component={MyAccount} />
+                <Route exact path='/my_account/edit_job/:jobId' component={EditJobPage} />
                 <Route path='/new_job' component={NewJob} />
-                <Route path='/service/:userId/:jobId/contract' component={ContractJob} />
                 <Route path='/history' component={History} />
                 <Route path='/professional_profile/contracts' component={ProfessionalProfileContracts} />
                 <Route exact path='/service/:professional_profile_id' component={ProfissionalProfilePage} />
                 <Route exact path='/service/:professional_profile_id/:job_id' component={JobPage} />
+                <Route exact path='/service/:professional_profile_id/:jobId/contract' component={ContractJob} />
             {/* </Switch> */}
         </BrowserRouter>
     );

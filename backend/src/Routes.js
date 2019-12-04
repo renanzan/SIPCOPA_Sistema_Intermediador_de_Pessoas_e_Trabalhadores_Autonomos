@@ -1,6 +1,4 @@
 const express = require('express');
-const multer = require('multer');
-const multerConfig = require('./config/multer');
 
 const AuthController = require('./app/controllers/AuthController');
 const UserController = require('./app/controllers/UserController');
@@ -25,6 +23,7 @@ routes.post('/auth/forgot_password', AuthController.forgotPssword);
 routes.post('/auth/reset_password', AuthController.resetPassword);
 routes.post('/auth/getConnectedId', AuthController.getId);
 
+routes.post('/user/get', UserController.getUserByAuthentication);
 routes.post('/getUser', UserController.getUserById);
 
 routes.post('/professional_profile', ProfessionalProfileController.index);
@@ -39,6 +38,7 @@ routes.post('/professional_profile/i_liked_it', ProfessionalProfileController.li
 
 routes.post('/service', FreelanceWorkController.index);
 routes.post('/job/new', FreelanceWorkController.store);
+routes.post('/job/edit', FreelanceWorkController.edit);
 routes.post('/job/show', FreelanceWorkController.show);
 routes.post('/job/suggest_price', FreelanceWorkController.getMarketStatistics);
 routes.post('/job/rate', FreelanceWorkController.rate);

@@ -10,8 +10,7 @@ import FormControl from '@material-ui/core/FormControl';
 import Button from '@material-ui/core/Button';
 
 export default function ContractJob({ history, match }) {
-    const userId = match.params.userId;
-    const jobId = match.params.jobId;
+    const { professional_profile_id, jobId } = match.params;
 
     const [loading, setLoading] = React.useState(true);
     const [professionalProfile, setProfessionalProfile] = React.useState();
@@ -21,7 +20,6 @@ export default function ContractJob({ history, match }) {
         (async() => {
             api.post('/job/show', {}, {
                 headers: {
-                    user_id: userId,
                     job_id: jobId
                 }
             }).then(response => {

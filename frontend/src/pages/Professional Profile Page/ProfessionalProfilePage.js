@@ -2,14 +2,15 @@ import React, { useState } from 'react';
 
 import api from '../../services/api';
 
-import '../../pages/Professional Profile Page/ProfessionalProfilePage.css';
+import './ProfessionalProfilePage.css';
 
 import LottieControl from '../../assets/animations/LottieControl';
 import PhotoProfileLoading from '../../assets/animations/lottie.json/photo-profile-loading.json';
 
 import Star from '../../assets/icons/star.svg';
 import Coin from '../../assets/icons/coin.svg';
-import TempImage from '../../temp/example_photo.png';
+import Like from '../../assets/icons/like.svg';
+import Unlike from '../../assets/icons/unlike.svg';
 
 export default function ProfessionalProfilePage({ history, match }) {
     const professionalProfileId = match.params.professional_profile_id;
@@ -32,7 +33,6 @@ export default function ProfessionalProfilePage({ history, match }) {
                     professional_profile_id: professionalProfileId
                 }
             }).then(response => {
-                console.log(response.data);
                 setProfessionalProfile(response.data.professionalProfile);
                 setUser(response.data.user);
                 setJobs(response.data.jobs);
@@ -62,15 +62,19 @@ export default function ProfessionalProfilePage({ history, match }) {
         <div className='main-container'>
             {
                 loading ? 'Loading...' :
-                <ProfessionalProfileInfo imageLoading={imageLoading} image={image} history={history} user={user} professionalProfile={professionalProfile} jobs={jobs} />
+                <ProfessionalProfileInfo history={history} imageLoading={imageLoading} image={image} history={history} user={user} professionalProfile={professionalProfile} jobs={jobs} />
             }
         </div>
     );
 }
 
-const ProfessionalProfileInfo = ({ imageLoading, image, user, professionalProfile, jobs }) => {
+const ProfessionalProfileInfo = ({ history, imageLoading, image, user, professionalProfile, jobs }) => {
 
     const [currentJob, setCurrentJob] = useState(0);
+
+    function handleContract() {
+        history.push(`/service/${user._id}/${jobs[currentJob]._id}`);
+    }
 
     return(
         <div className="accountInfoContainer">
@@ -110,7 +114,7 @@ const ProfessionalProfileInfo = ({ imageLoading, image, user, professionalProfil
                                 {jobs[currentJob].price}
                             </div>
                             <div style={{ padding:'0 20px', flex:1, display:'flex', alignItems:'center', justifyContent:'center' }}>
-                                <button style={{ margin:0, flex:1, height:'60px' }}>Contratar</button>
+                                <button style={{ margin:0, flex:1, height:'60px' }} onClick={handleContract}>Contratar</button>
                             </div>
                         </div>
                     </div>
@@ -121,10 +125,22 @@ const ProfessionalProfileInfo = ({ imageLoading, image, user, professionalProfil
 }
 
 const UserInfo = ({ imageLoading, image, currentJob, setCurrentJob, user, professionalProfile, jobs }) => {
-    const [likesCount, setLikesCount] = React.useState(professionalProfile.likes.length);
+    const [likes, setLikes] = React.useState(professionalProfile.likes);
+    const [userId, setUserId] = React.useState();
+
+    React.useEffect(() => {
+        (async() => {
+            await api.post('/user/get', {}, {
+                headers: {
+                    authentication: localStorage.getItem('@sipcopa/token'),
+                }
+            }).then(response => {
+                setUserId(response.data._id);
+            });
+        })();
+    }, []);
 
     function handleLike() {
-        console.log('LIKE!');
         (async() => {
             await api.post('/professional_profile/like', {}, {
                 headers: {
@@ -132,7 +148,7 @@ const UserInfo = ({ imageLoading, image, currentJob, setCurrentJob, user, profes
                     professional_profile_id: professionalProfile._id
                 }
             }).then(response => {
-                setLikesCount(response.data.likes.length);
+                setLikes(response.data.likes);
             });
         })();
     }
@@ -145,8 +161,12 @@ const UserInfo = ({ imageLoading, image, currentJob, setCurrentJob, user, profes
             }
             <div style={styles.infoContainer} >
                 <div style={styles.likesContainer} className="unselectable">
-                    <input type='submit' value='like' onClick={handleLike}/>
-                    <label>+{likesCount} likes</label>
+                    {
+                        likes.includes(userId) ?
+                            <img src={Like} onClick={handleLike} style={{ cursor:'pointer' }} /> :
+                            <img src={Unlike} onClick={handleLike} style={{ cursor:'pointer' }} />
+                    }
+                    <label>+{likes.length} likes</label>
                 </div>
                 <div style={styles.profileFullName}>{professionalProfile.fullName}</div>
                 <div style={styles.biography}>{professionalProfile.biography}</div>
@@ -186,6 +206,11 @@ const styles = {
         borderRadius: '50%'
     },
     likesContainer: {
+        display:'flex',
+        flexDirection:'column',
+        alignItems:'center',
+        justifyContent:'center',
+        fontSize:'12px',
         position: 'absolute',
         top: '10px',
         right: '10px',

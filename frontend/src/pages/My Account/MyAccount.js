@@ -12,6 +12,7 @@ import { InputText } from '../../components/custom/Input';
 import Star from '../../assets/icons/star.svg';
 import Coin from '../../assets/icons/coin.svg';
 import Desert from '../../assets/images/desert.svg';
+import Like from '../../assets/icons/like.svg';
 
 export default function MyAccount({ history }) {
     const [loading, setLoading] = useState(true);
@@ -109,6 +110,10 @@ const ProfessionalProfileInfo = ({ history, currentJob, setCurrentJob, user, pro
 
         window.location.reload();
     }
+
+    async function handleEditJob() {
+        history.push(`/my_account/edit_job/${professionalProfile.jobs[currentJob]._id}`);
+    }
     
     return(
         editProfessionalProfile ?
@@ -172,7 +177,7 @@ const ProfessionalProfileInfo = ({ history, currentJob, setCurrentJob, user, pro
                                     {professionalProfile.jobs[currentJob].price}
                                 </div>
                                 <div style={{ padding:'0 20px', flex:1, display:'flex', alignItems:'center', justifyContent:'center' }}>
-                                    <button style={{ margin:0, flex:1, height:'60px' }}>Contratar</button>
+                                    <button style={{ margin:0, flex:1, height:'60px' }} onClick={handleEditJob} >Editar Trabalho</button>
                                 </div>
                             </div>
                         </div>
@@ -214,7 +219,10 @@ const UserInfo = ({ currentJob, setCurrentJob, professionalProfile }) => {
                 <img src={image.type + ',' + image.buff} style={styles.profilePhoto} width='128px' height='128px' className="unselectable"/>
             }
             <div style={styles.infoContainer} >
-                <div style={styles.likesContainer} className="unselectable">+{professionalProfile.professionalProfile.likes.length} likes</div>
+            <div style={styles.likesContainer} className="unselectable">
+            <img src={Like} />
+                    <label>+{professionalProfile.professionalProfile.likes.length} likes</label>
+                </div>
                 <div style={styles.profileFullName}>{professionalProfile.professionalProfile.fullName}</div>
                 <div style={styles.biography}>{professionalProfile.professionalProfile.biography}</div>
                 <div style={styles.tagJobsContainer}>
@@ -401,6 +409,11 @@ const styles = {
         borderRadius: '50%'
     },
     likesContainer: {
+        display:'flex',
+        flexDirection:'column',
+        alignItems:'center',
+        justifyContent:'center',
+        fontSize:'12px',
         position: 'absolute',
         top: '10px',
         right: '10px',

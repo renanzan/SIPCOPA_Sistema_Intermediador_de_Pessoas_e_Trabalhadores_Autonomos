@@ -14,6 +14,8 @@ import LottieControl from '../../assets/animations/LottieControl';
 import Slider from '@material-ui/core/Slider';
 import Switch from '@material-ui/core/Switch';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
+import ToggleButton from '@material-ui/lab/ToggleButton';
+import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import Typography from '@material-ui/core/Typography';
 
 import Footer from '../../components/Footer/Footer';
@@ -27,6 +29,7 @@ export default function Service ({ history }) {
     
     const [gte, setGte] = useState(0);
     const [lte, setLte] = useState(1000);
+    const [perpage, setPerpage] = useState(5);
 
     const [onlyLiked, setOnlyLiked] = useState(false);
 
@@ -61,13 +64,13 @@ export default function Service ({ history }) {
             }
         }, {
             headers: {
-                perpage: 15
+                perpage: perpage ? perpage : 5
             }
         }).then((response) => {
             setJobs(response.data);
             setLoading(false);
         });
-    }, [page, reload, lowestPrice, gte, lte]);
+    }, [page, reload, perpage, lowestPrice, gte, lte]);
 
     function handleChangePage(e) {
         (e === 'NEXT') ? (() => {
@@ -98,12 +101,9 @@ export default function Service ({ history }) {
 
     return(
         <div className='main-container'>
-            {/* <button onClick={ e => handleChangePage('NEXT') }>NEXT</button>
-            <button onClick={ e => handleChangePage() }>PREV</button> */}
-            
             <SearchContainer history={history} currentPage={page} setGte={setGte} setLte={setLte} search={search} setSearch={setSearch} jobs={jobs} reload={reload} setReload={setReload} />
             <div className="list-container">
-                <Filter loading={loading} jobs={jobs} setGte={setGte} setLte={setLte} onlyLiked={onlyLiked} setOnlyLiked={setOnlyLiked} lowestPrice={lowestPrice} setLowestPrice={setLowestPrice} />
+                <Filter loading={loading} jobs={jobs} perpage={perpage} setPerpage={setPerpage} setGte={setGte} setLte={setLte} onlyLiked={onlyLiked} setOnlyLiked={setOnlyLiked} lowestPrice={lowestPrice} setLowestPrice={setLowestPrice} />
                 {
                     loading ? (() => {
                         if((Math.floor(Math.random()*3) + 1) === 1)
@@ -113,7 +113,13 @@ export default function Service ({ history }) {
                         else
                             return(<LottieControl animationData={AnimationData3} height="400" style={styles.loadingContainer} />);
                         })() :
-                    <List onlyLiked={onlyLiked} jobs={jobs} history={history} />
+                    <div style={{ display:'flex', flexDirection:'column', width:'100%' }}>
+                        <List onlyLiked={onlyLiked} jobs={jobs} history={history} />
+                        <div style={{ alignSelf:'flex-end', margin:'20px 20px 40px 0' }}>
+                            <button onClick={ e => handleChangePage() }>Anterior</button>
+                            <button onClick={ e => handleChangePage('NEXT') } style={{ marginLeft:'10px' }}>Seguinte</button>
+                        </div>
+                    </div>
                 }
             </div>
             {/* <Footer /> */}
@@ -130,7 +136,7 @@ const SearchContainer = ({ history, search, setSearch, jobs, setGte, setLte, rel
     );
 }
 
-const Filter = ({ loading, jobs, setGte, setLte, onlyLiked, setOnlyLiked, lowestPrice, setLowestPrice }) => {
+const Filter = ({ loading, jobs, perpage, setPerpage, setGte, setLte, onlyLiked, setOnlyLiked, lowestPrice, setLowestPrice }) => {
     var maxPrice, minPrice;
     const [value, setValue] = React.useState([]);
 
@@ -172,6 +178,21 @@ const Filter = ({ loading, jobs, setGte, setLte, onlyLiked, setOnlyLiked, lowest
         }
     ];
 
+    const children = [
+        <ToggleButton key={1} value="5">
+          <label>5</label>
+        </ToggleButton>,
+        <ToggleButton key={2} value="10">
+          <label>10</label>
+        </ToggleButton>,
+        <ToggleButton key={3} value="15">
+          <label>15</label>
+        </ToggleButton>,
+        <ToggleButton key={4} value="20">
+          <label>20</label>
+        </ToggleButton>,
+      ];
+
     return(
         <div className="left-container">
             <OrderBy style={{ marginBottom: '25px' }} lowestPrice={lowestPrice} setLowestPrice={setLowestPrice} />
@@ -179,6 +200,10 @@ const Filter = ({ loading, jobs, setGte, setLte, onlyLiked, setOnlyLiked, lowest
             <div className="filter-container">
                 <div className="filter-content">
                     <label className="title">Filtros</label>
+
+                    <ToggleButtonGroup size="small" value={perpage} exclusive onChange={(event, newPerpage) => { setPerpage(newPerpage); }}>
+                        {children}
+                    </ToggleButtonGroup>
 
                     <FormControlLabel
                         control={
@@ -246,7 +271,8 @@ const styles = {
         flex: 1,
         alignSelf: 'flex-start',
         display: 'flex',
-        flexWrap: 'wrap'
+        flexWrap: 'wrap',
+        marginTop: '68px'
     },
     loadingContainer: {
         width: '100%',

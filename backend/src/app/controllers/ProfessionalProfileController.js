@@ -10,7 +10,10 @@ const index = async (req, res) => {
     
     try {
         const professionalProfile = await checkIfHaveProfessionalProfile(authentication);
-        return res.json({ professionalProfile });
+
+        const jobs = await await FreelanceWork.find({ professionalProfileId: professionalProfile._id });
+
+        return res.json({ professionalProfile, jobs });
     } catch(err) {
         return res.json({ err });
     }

@@ -3,6 +3,8 @@ import React from 'react';
 import './history.css';
 import api from '../../services/api';
 
+import Rating from '@material-ui/lab/Rating';
+
 import Star from '../../assets/icons/star.svg';
 import StarOff from '../../assets/icons/star-off.svg';
 import TextField from '@material-ui/core/TextField';
@@ -139,7 +141,7 @@ const JobCard = ({ contract }) => {
 
 const ServiceRating = ({ contract }) => {
     const [comment, setComment] = React.useState();
-    const [rate, setRate] = React.useState(1);
+    const [rate, setRate] = React.useState(0);
 
     function handleRate(rateValue) {
         setRate(rateValue);
@@ -174,36 +176,7 @@ const ServiceRating = ({ contract }) => {
                         <div style={{ display:'flex', justifyContent:'space-between' }}>
                             <label style={{ fontSize:'14px', color:'rgba(0, 0, 0, 0.35)' }}>Sua avaliação</label>
                             <div style={{ display:'flex', flexDirection:'row' }}>
-                                {
-                                    contract.rate.$numberDecimal >= 1 ?
-                                        <img src={Star} width='20px' style={{ marginRight:'5px' }} />
-                                    :
-                                        <img src={StarOff} width='20px' style={{ marginRight:'5px' }} />
-                                }
-                                {
-                                    contract.rate.$numberDecimal >= 2 ?
-                                        <img src={Star} width='20px' style={{ marginRight:'5px' }} />
-                                    :
-                                        <img src={StarOff} width='20px' style={{ marginRight:'5px' }} />
-                                }
-                                {
-                                    contract.rate.$numberDecimal >= 3 ?
-                                        <img src={Star} width='20px' style={{ marginRight:'5px' }} />
-                                    :
-                                        <img src={StarOff} width='20px' style={{ marginRight:'5px' }} />
-                                }
-                                {
-                                    contract.rate.$numberDecimal >= 4 ?
-                                        <img src={Star} width='20px' style={{ marginRight:'5px' }} />
-                                    :
-                                        <img src={StarOff} width='20px' style={{ marginRight:'5px' }} />
-                                }
-                                {
-                                    contract.rate.$numberDecimal >= 5 ?
-                                        <img src={Star} width='20px' style={{ marginRight:'5px' }} />
-                                    :
-                                        <img src={StarOff} width='20px' style={{ marginRight:'5px' }} />
-                                }
+                                <Rating name="half-rating" value={contract.rate.$numberDecimal} disabled />
                             </div>
                         </div>
 
@@ -223,36 +196,7 @@ const ServiceRating = ({ contract }) => {
                         <div style={{ display:'flex', justifyContent:'space-between' }}>
                             <label style={{ fontSize:'14px', color:'rgba(0, 0, 0, 0.35)' }}>Avalie o serviço</label>
                             <div style={{ display:'flex', flexDirection:'row' }}>
-                                {
-                                    rate >= 1 ?
-                                        <img src={Star} width='20px' onClick={e => handleRate(1)} style={{ cursor:'pointer', marginRight:'5px' }} />
-                                    :
-                                        <img src={StarOff} width='20px' onClick={e => handleRate(1)} style={{ cursor:'pointer', marginRight:'5px' }} />
-                                }
-                                {
-                                    rate >= 2 ?
-                                        <img src={Star} width='20px' onClick={e => handleRate(2)} style={{ cursor:'pointer', marginRight:'5px' }} />
-                                    :
-                                        <img src={StarOff} width='20px' onClick={e => handleRate(2)} style={{ cursor:'pointer', marginRight:'5px' }} />
-                                }
-                                {
-                                    rate >= 3 ?
-                                        <img src={Star} width='20px' onClick={e => handleRate(3)} style={{ cursor:'pointer', marginRight:'5px' }} />
-                                    :
-                                        <img src={StarOff} width='20px' onClick={e => handleRate(3)} style={{ cursor:'pointer', marginRight:'5px' }} />
-                                }
-                                {
-                                    rate >= 4 ?
-                                        <img src={Star} width='20px' onClick={e => handleRate(4)} style={{ cursor:'pointer', marginRight:'5px' }} />
-                                    :
-                                        <img src={StarOff} width='20px' onClick={e => handleRate(4)} style={{ cursor:'pointer', marginRight:'5px' }} />
-                                }
-                                {
-                                    rate >= 5 ?
-                                        <img src={Star} width='20px' onClick={e => handleRate(5)} style={{ cursor:'pointer' }} />
-                                    :
-                                        <img src={StarOff} width='20px' onClick={e => handleRate(5)} style={{ cursor:'pointer'}} />
-                                }
+                                <Rating name="half-rating" value={rate} onClick={ e => { setRate(Number.parseFloat(e.target.value)); } } precision={1} />
                             </div>
                         </div>
 

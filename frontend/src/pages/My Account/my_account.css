@@ -75,12 +75,15 @@ ul.professionalProfileMenu {
 ul.professionalProfileMenu li {
     font-variant: small-caps;
     margin: 0 20px 0 0;
+    padding: 5px;
+    border-radius: 4px;
     cursor: pointer;
     color: #656570;
     transition: 200ms;
 }
 
 ul.professionalProfileMenu li:hover {
+    background: rgb(236, 236, 236);
     font-weight: 600;
 }
 
@@ -107,6 +110,7 @@ div.negative-button:hover {
     div.accountInfoContainer {
         flex-direction: column;
         height: auto;
+        margin-top: 50px;
     }
 
     div.jobCard {

@@ -27,6 +27,31 @@ module.exports = {
         });
     },
 
+    async edit(req, res) {
+        const { authentication } = req.headers;
+        const { job_id, description, price } = req.body;
+
+        await checkIfHaveProfessionalProfile(authentication).then(async (response) => {
+            const { _id: professionalProfileId } = response;
+
+            const job = await FreelanceWork.findOne({ _id: job_id, professionalProfileId });
+
+            console.log(job_id);
+            console.log(professionalProfileId);
+
+            if(job) {
+                job.description = description;
+                job.price = price;
+                job.save();
+            }
+
+            return res.json(job);
+        })
+        .catch((err) => {
+            return res.json(err);
+        });
+    },
+
     async show(req, res) {
         const { job_id:jobId } = req.headers;
 

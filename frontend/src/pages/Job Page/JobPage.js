@@ -4,10 +4,11 @@ import api from '../../services/api';
 
 import '../../pages/Professional Profile Page/ProfessionalProfilePage.css';
 
+import Rating from '@material-ui/lab/Rating';
+
 import Star from '../../assets/icons/star.svg';
 import StarOff from '../../assets/icons/star-off.svg';
 import User from '../../assets/icons/user.svg';
-import TempImage from '../../temp/example_photo.png';
 
 export default function ProfessionalProfilePage({ history, location, match }) {
     const jobId = match.params.job_id;
@@ -36,13 +37,14 @@ export default function ProfessionalProfilePage({ history, location, match }) {
                 }
             }).then(response => {
                 response.data.forEach(element => {
-                    if(element.status === 'close' && element.rate.$numberDecimal >= 0)
-                        setComments(comments => [...comments, {
-                            employer: element.employer,
-                            rate: element.rate.$numberDecimal,
-                            comment: element.comment,
-                            updatedAt: element.updatedAt
-                        }]);
+                    if(element.status === 'close' && element.rate)
+                        if(element.rate.$numberDecimal >= 0)
+                            setComments(comments => [...comments, {
+                                employer: element.employer,
+                                rate: element.rate.$numberDecimal,
+                                comment: element.comment,
+                                updatedAt: element.updatedAt
+                            }]);
                 });
                 setLoading(false);
             });
@@ -66,36 +68,7 @@ export default function ProfessionalProfilePage({ history, location, match }) {
                         <div style={{ display:'flex', flexDirection:'column', alignItems:'center'}}>
                             <label style={{ fontWeight:800, fontSize:'36px' }}>{parseFloat(job.rate_weighted_average.$numberDecimal).toFixed(1)}</label>
                             <div>
-                                {
-                                    job.rate_weighted_average.$numberDecimal >= 1 ?
-                                        <img src={Star} width='25px' style={{ marginRight:'5px' }} />
-                                    :
-                                        <img src={StarOff} width='25px' style={{ marginRight:'5px' }} />
-                                }
-                                {
-                                    job.rate_weighted_average.$numberDecimal >= 2 ?
-                                        <img src={Star} width='25px' style={{ marginRight:'5px' }} />
-                                    :
-                                        <img src={StarOff} width='25px' style={{ marginRight:'5px' }} />
-                                }
-                                {
-                                    job.rate_weighted_average.$numberDecimal >= 3 ?
-                                        <img src={Star} width='25px' style={{ marginRight:'5px' }} />
-                                    :
-                                        <img src={StarOff} width='25px' style={{ marginRight:'5px' }} />
-                                }
-                                {
-                                    job.rate_weighted_average.$numberDecimal >= 4 ?
-                                        <img src={Star} width='25px' style={{ marginRight:'5px' }} />
-                                    :
-                                        <img src={StarOff} width='25px' style={{ marginRight:'5px' }} />
-                                }
-                                {
-                                    job.rate_weighted_average.$numberDecimal >= 5 ?
-                                        <img src={Star} width='25px' style={{ marginRight:'5px' }} />
-                                    :
-                                        <img src={StarOff} width='25px' style={{ marginRight:'5px' }} />
-                                }
+                                <Rating name="half-rating" value={Number.parseFloat(job.rate_weighted_average.$numberDecimal)} precision={0.1} disabled />
                             </div>
                             <label style={{ fontSize:'12px', color:'rgba(0, 0, 0, 0.4)' }}>{comments.length} avaliações</label>
                         </div>
@@ -158,37 +131,8 @@ const CommentCard = ({ history, userId, rate, comment, updatedAt }) => {
                             <div>
                                 <div style={{ marginBottom:'5px', fontWeight:600 }}>{username}</div>
                                 <div style={{ display:'flex', flexDirection:'row', alignItems:'center' }}>
-                                        <label style={{ fontWeight:600, marginRight:'10px', fontSize:'14px' }}>{rate},0</label><br />
-                                        {
-                                            rate >= 1 ?
-                                                <img src={Star} width='15px' style={{ marginRight:'5px' }} />
-                                            :
-                                                <img src={StarOff} width='15px' style={{ marginRight:'5px' }} />
-                                        }
-                                        {
-                                            rate >= 2 ?
-                                                <img src={Star} width='15px' style={{ marginRight:'5px' }} />
-                                            :
-                                                <img src={StarOff} width='15px' style={{ marginRight:'5px' }} />
-                                        }
-                                        {
-                                            rate >= 3 ?
-                                                <img src={Star} width='15px' style={{ marginRight:'5px' }} />
-                                            :
-                                                <img src={StarOff} width='15px' style={{ marginRight:'5px' }} />
-                                        }
-                                        {
-                                            rate >= 4 ?
-                                                <img src={Star} width='15px' style={{ marginRight:'5px' }} />
-                                            :
-                                                <img src={StarOff} width='15px' style={{ marginRight:'5px' }} />
-                                        }
-                                        {
-                                            rate >= 5 ?
-                                                <img src={Star} width='15px' style={{ marginRight:'5px' }} />
-                                            :
-                                                <img src={StarOff} width='15px' style={{ marginRight:'5px' }} />
-                                        }
+                                        <label style={{ fontWeight:600, marginRight:'10px', fontSize:'14px' }}>{rate}.0</label><br />
+                                        <Rating name="half-rating" size='small' value={rate} precision={1} disabled />
                                         <label style={{ marginLeft:'10px', color:'rgba(0, 0, 0, 0.6)', fontSize:'12px' }}>{ `${String(date.getDate()).padStart(2, '0')}/${date.getMonth()+1}/${date.getFullYear()}` }</label><br />
                                     </div>
                             </div>

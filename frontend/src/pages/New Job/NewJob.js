@@ -51,18 +51,36 @@ export default function NewJob({ history }) {
 
 const InputTipo = ({ job, setJob }) => {
     const inputLabel = React.useRef(null);
-
-    const [jobOptions, setJobOptions] = React.useState();
+    
+    const [myJobs, setMyJobs] = React.useState([]);
+    const [jobOptions, setJobOptions] = React.useState([]);
+    const [loading, setLoading] = React.useState(true);
 
     React.useEffect(() => {
-        (async () => {
-            const allJobOptions = await api.get('get_job_option');
+      setLoading(true);
 
-            if(allJobOptions) {
-                setJobOptions(allJobOptions.data);
+      (async () => {
+          await api.post('/professional_profile', {}, {
+            headers: {
+              authentication: localStorage.getItem('@sipcopa/token')
             }
-        })();
+          }).then(response => {
+            response.data.jobs.forEach(element => {
+              setMyJobs(myJobs => [...myJobs, element.job]);
+            });
+          });
+
+          await api.get('get_job_option').then(response => {
+            setJobOptions(response.data);
+            setLoading(false);
+          });
+      })();
     }, []);
+
+    var array_difference;
+
+    if(!loading)
+      array_difference = jobOptions.filter(x => !myJobs.includes(x.toString()));
 
     const [labelWidth, setLabelWidth] = React.useState(0);
     React.useEffect(() => {
@@ -81,8 +99,8 @@ const InputTipo = ({ job, setJob }) => {
                 style={{ width:'100%', minWidth: 300 }}>
                     
                 {
-                    jobOptions ?
-                        jobOptions.map((element, index) => {
+                    array_difference ?
+                      array_difference.map((element, index) => {
                             return(
                                 <MenuItem key={index} value={element}>{element}</MenuItem>
                             );
